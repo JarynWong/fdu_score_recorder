@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jaryn.recorder.mapper.ScoreMapper">
+<!--    <cache></cache>-->
+
+    <!-- 插入 -->
+    <insert id="create" parameterType="com.jaryn.recorder.bean.Score">
+        INSERT INTO score
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null">name, </if>
+            <if test="admissionTicket != null">admission_ticket, </if>
+            <if test="username != null">username, </if>
+            <if test="politics != null">politics, </if>
+            <if test="english != null">english, </if>
+            <if test="professionalCourse1Score != null">professional_course1_score, </if>
+            <if test="professionalCourse1Name != null">professional_course1_name, </if>
+            <if test="professionalCourse2Score != null">professional_course2_score, </if>
+            <if test="professionalCourse2Name != null">professional_course2_name, </if>
+            <if test="totalScore != null">total_score, </if>
+            <if test="applyingMajorId != null">applying_major_id, </if>
+            <if test="year != null">year, </if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="name != null">#{name}, </if>
+            <if test="admissionTicket != null">#{admissionTicket}, </if>
+            <if test="username != null">#{username}, </if>
+            <if test="politics != null">#{politics}, </if>
+            <if test="english != null">#{english}, </if>
+            <if test="professionalCourse1Score != null">#{professionalCourse1Score}, </if>
+            <if test="professionalCourse1Name != null">#{professionalCourse1Name}, </if>
+            <if test="professionalCourse2Score != null">#{professionalCourse2Score}, </if>
+            <if test="professionalCourse2Name != null">#{professionalCourse2Name}, </if>
+            <if test="totalScore != null">#{totalScore}, </if>
+            <if test="applyingMajorId != null">#{applyingMajorId}, </if>
+            <if test="year != null">#{year}, </if>
+        </trim>
+    </insert>
+
+    <!-- 查询单个 -->
+    <select id="findOne" parameterType="com.jaryn.recorder.bean.Score" resultType="com.jaryn.recorder.bean.Score">
+        SELECT * FROM score
+        <where>
+            <if test="id != null"> id = #{id} </if>
+            <if test="name != null"> AND name = #{name} </if>
+            <if test="admissionTicket != null"> AND admission_ticket = #{admissionTicket} </if>
+            <if test="username != null"> AND username = #{username} </if>
+            <if test="politics != null"> AND politics = #{politics} </if>
+            <if test="english != null"> AND english = #{english} </if>
+            <if test="professionalCourse1Score != null"> AND professional_course1_score = #{professionalCourse1Score} </if>
+            <if test="professionalCourse1Name != null"> AND professional_course1_name = #{professionalCourse1Name} </if>
+            <if test="professionalCourse2Score != null"> AND professional_course2_score = #{professionalCourse2Score} </if>
+            <if test="professionalCourse2Name != null"> AND professional_course2_name = #{professionalCourse2Name} </if>
+            <if test="totalScore != null"> AND total_score = #{totalScore} </if>
+            <if test="applyingMajorId != null"> AND applying_major_id = #{applyingMajorId} </if>
+            <if test="year != null"> AND year = #{year} </if>
+        </where>
+    </select>
+
+    <!-- 查询所有 -->
+    <select id="find" parameterType="com.jaryn.recorder.bean.Score" resultType="com.jaryn.recorder.bean.Score">
+        SELECT * FROM score
+        <where>
+            <if test="id != null"> id = #{id} </if>
+            <if test="name != null"> AND name = #{name} </if>
+            <if test="admissionTicket != null"> AND admission_ticket = #{admissionTicket} </if>
+            <if test="username != null"> AND username = #{username} </if>
+            <if test="politics != null"> AND politics = #{politics} </if>
+            <if test="english != null"> AND english = #{english} </if>
+            <if test="professionalCourse1Score != null"> AND professional_course1_score = #{professionalCourse1Score} </if>
+            <if test="professionalCourse1Name != null"> AND professional_course1_name = #{professionalCourse1Name} </if>
+            <if test="professionalCourse2Score != null"> AND professional_course2_score = #{professionalCourse2Score} </if>
+            <if test="professionalCourse2Name != null"> AND professional_course2_name = #{professionalCourse2Name} </if>
+            <if test="totalScore != null"> AND total_score = #{totalScore} </if>
+            <if test="applyingMajorId != null"> AND applying_major_id = #{applyingMajorId} </if>
+            <if test="year != null"> AND year = #{year} </if>
+        </where>
+    </select>
+
+</mapper>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jaryn.recorder.mapper.ApplyingMajorMapper">
+<!--    <cache></cache>-->
+
+    <!-- 查询单个 -->
+    <select id="findOne" parameterType="com.jaryn.recorder.bean.ApplyingMajor" resultType="com.jaryn.recorder.bean.ApplyingMajor">
+        SELECT * FROM `applying_major`
+        <where>
+            <if test="applyingMajorId != null"> applying_major_id = #{applyingMajorId} </if>
+            <if test="applyingMajorName != null"> AND applying_major_name = #{applyingMajorName} </if>
+        </where>
+    </select>
+
+
+    <!-- 查询所有 -->
+    <select id="find" parameterType="com.jaryn.recorder.bean.ApplyingMajor" resultType="com.jaryn.recorder.bean.ApplyingMajor">
+        SELECT * FROM `applying_major`
+        <where>
+            <if test="applyingMajorId != null"> applying_major_id = #{applyingMajorId} </if>
+            <if test="applyingMajorName != null"> AND applying_major_name = #{applyingMajorName} </if>
+        </where>
+    </select>
+
+</mapper>

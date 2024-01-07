@@ -1,0 +1,10 @@
+/Users/wangyongjiang/IdeaProjects/spring-boot-mybatis/src/main/java/com/wyj/springbootmybatis/config/MyBatisConfig.java
+/Users/wangyongjiang/IdeaProjects/spring-boot-mybatis/src/main/java/com/wyj/springbootmybatis/bean/Dep.java
+/Users/wangyongjiang/IdeaProjects/spring-boot-mybatis/src/main/java/com/wyj/springbootmybatis/mapper/DepMapper.java
+/Users/wangyongjiang/IdeaProjects/spring-boot-mybatis/src/main/java/com/wyj/springbootmybatis/bean/HelloServlet.java
+/Users/wangyongjiang/IdeaProjects/spring-boot-mybatis/src/main/java/com/wyj/springbootmybatis/bean/Emp.java
+/Users/wangyongjiang/IdeaProjects/spring-boot-mybatis/src/main/java/com/wyj/springbootmybatis/controller/EmpController.java
+/Users/wangyongjiang/IdeaProjects/spring-boot-mybatis/src/main/java/com/wyj/springbootmybatis/config/DruidConfig.java
+/Users/wangyongjiang/IdeaProjects/spring-boot-mybatis/src/main/java/com/wyj/springbootmybatis/SpringBootMybatisApplication.java
+/Users/wangyongjiang/IdeaProjects/spring-boot-mybatis/src/main/java/com/wyj/springbootmybatis/mapper/EmpMapper.java
+/Users/wangyongjiang/IdeaProjects/spring-boot-mybatis/src/main/java/com/wyj/springbootmybatis/controller/DepController.java
