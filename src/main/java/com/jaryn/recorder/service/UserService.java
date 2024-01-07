@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 
 import static com.jaryn.recorder.constants.Constant.Http.*;
 import static com.jaryn.recorder.constants.Constant.QueryType.TOTAL;
+import static com.jaryn.recorder.constants.Constant.Score.COLUMN_CHART_MIN_SCORE;
 
 /**
  * @author: Jaryn
@@ -214,8 +215,8 @@ public class UserService {
         }
         calculateColumnChartCount(overallScores, maxScoreColumnChart, queryType);
 
-        // 最低分段柱状图计算
-        int minScore = functionByQueryType.applyAsInt(overallScores.get(overallScores.size() - 1));
+        // 最低分段柱状图计算，321分以下就不统计了
+        int minScore = Math.max(functionByQueryType.applyAsInt(overallScores.get(overallScores.size() - 1)), COLUMN_CHART_MIN_SCORE);
         // minScore = 未出分前的最低分 或 出分后的录取分数(总分才有)
         AdmissionScore admissionScore = scoreService.getAdmissionScore(applyingMajorId);
         if (admissionScore != null && TOTAL.equals(queryType)) {

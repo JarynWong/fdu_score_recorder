@@ -36,9 +36,8 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         // 注册拦截器
-        registry.addInterceptor(rateLimiterInterceptor);
         registry.addInterceptor(loggingInterceptor);
-
+        registry.addInterceptor(rateLimiterInterceptor);
         registry.addInterceptor(userInterceptor);
     }
 

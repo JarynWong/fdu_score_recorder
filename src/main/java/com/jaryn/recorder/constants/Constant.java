@@ -45,4 +45,8 @@ public class Constant {
         public static final String PROFESSIONAL_COURSE1 = "4";
         public static final String PROFESSIONAL_COURSE2 = "5";
     }
+
+    public static class Score {
+        public static final int COLUMN_CHART_MIN_SCORE = 321;
+    }
 }
