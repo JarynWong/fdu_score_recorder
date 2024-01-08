@@ -56,31 +56,10 @@ public class UserController {
 
         String token = UUID.randomUUID().toString();
         cache.put(token, user);
-        assembleCookie(response, token);
+        userService.assembleCookie(response, token);
         return loginResponse;
     }
 
-    /**
-     * 封装ck
-     *
-     * @param response
-     * @param token
-     */
-    private void assembleCookie(HttpServletResponse response, String token) {
-        // 创建一个新的 Cookie 来存储会话 ID
-        Cookie sessionCookie = new Cookie(USER_TOKEN, token);
-        // 设置 cookie 过期时间为 5天
-        sessionCookie.setMaxAge(60 * 60 * 24 * 5);
-        // 防止 JavaScript 访问此 cookie
-        sessionCookie.setHttpOnly(true);
-        // 设置 cookie 应用的路径
-        sessionCookie.setPath("/");
-        // 安全标志，只在HTTPS下发送
-        sessionCookie.setSecure(true);
-        // 将 Cookie 添加到响应中
-        response.addCookie(sessionCookie);
 
-        response.addCookie(new Cookie("SameSite", "None"));
-    }
 
 }

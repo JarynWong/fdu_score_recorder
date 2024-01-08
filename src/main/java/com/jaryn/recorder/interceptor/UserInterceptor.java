@@ -8,6 +8,7 @@ package com.jaryn.recorder.interceptor;
 import com.google.common.cache.Cache;
 import com.jaryn.recorder.bean.UserInfo;
 import com.jaryn.recorder.exception.ServiceException;
+import com.jaryn.recorder.service.UserService;
 import com.jaryn.recorder.utils.OkHttpUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
@@ -31,6 +32,9 @@ public class UserInterceptor implements HandlerInterceptor {
     @Autowired
     private Cache<String, Object> cache;
 
+    @Autowired
+    private UserService userService;
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException {
 
@@ -44,46 +48,26 @@ public class UserInterceptor implements HandlerInterceptor {
         }
 
 
-
-        boolean hasValid = checkTokenValid(OkHttpUtil.getToken(request));
+        String token = OkHttpUtil.getToken(request);
+        Object userInfo = getUserInfo(token);
+        boolean hasValid = userInfo != null;
 
         if (!hasValid) {
             // 如果 cookie 无效或不存在，执行特定操作，如重定向到登录页面
             throw new ServiceException("登陆过期");
         }
-        // assembleCookie(response, OkHttpUtil.getToken(request));
+        // ck刷新 + cache刷新
+        userService.assembleCookie(response, token);
+        cache.put(token, userInfo);
         return true;
     }
 
-    private boolean checkTokenValid(String sessionId) {
-        Object user = cache.getIfPresent(sessionId);
+    private Object getUserInfo(String token) {
+        Object user = cache.getIfPresent(token);
         if (user != null) {
             log.info("用户姓名：" + ((UserInfo)user).getName());
         }
-        return user != null;
-    }
-
-    /**
-     * 封装ck
-     *
-     * @param response
-     * @param token
-     */
-    private void assembleCookie(HttpServletResponse response, String token) {
-        // 创建一个新的 Cookie 来存储会话 ID
-        Cookie sessionCookie = new Cookie(USER_TOKEN, token);
-        // 设置 cookie 过期时间为 5天
-        sessionCookie.setMaxAge(60 * 60 * 24 * 5);
-        // 防止 JavaScript 访问此 cookie
-        sessionCookie.setHttpOnly(true);
-        // 设置 cookie 应用的路径
-        sessionCookie.setPath("/");
-        // 安全标志，只在HTTPS下发送
-        sessionCookie.setSecure(true);
-        // 将 Cookie 添加到响应中
-        response.addCookie(sessionCookie);
-
-        response.addCookie(new Cookie("SameSite", "None"));
+        return user;
     }
 
 }

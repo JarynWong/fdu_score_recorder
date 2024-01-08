@@ -19,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.util.*;
 import java.util.function.ToIntFunction;
@@ -266,6 +268,29 @@ public class UserService {
         }
         columnCharts.add(maxScoreColumnChart);
         return columnCharts;
+    }
+
+    /**
+     * 封装ck
+     *
+     * @param response
+     * @param token
+     */
+    public void assembleCookie(HttpServletResponse response, String token) {
+        // 创建一个新的 Cookie 来存储会话 ID
+        Cookie sessionCookie = new Cookie(USER_TOKEN, token);
+        // 设置 cookie 过期时间为 5天
+        sessionCookie.setMaxAge(60 * 60 * 24 * 2);
+        // 防止 JavaScript 访问此 cookie
+        sessionCookie.setHttpOnly(true);
+        // 设置 cookie 应用的路径
+        sessionCookie.setPath("/");
+        // 安全标志，只在HTTPS下发送
+        sessionCookie.setSecure(true);
+        // 将 Cookie 添加到响应中
+        response.addCookie(sessionCookie);
+
+        response.addCookie(new Cookie("SameSite", "None"));
     }
 
 
