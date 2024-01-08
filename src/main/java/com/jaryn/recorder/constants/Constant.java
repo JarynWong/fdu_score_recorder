@@ -11,6 +11,7 @@ public class Constant {
         public static final String LOGIN = "/login";
         public static final String CHECK_STATE = "/checkstate";
         public static final String QUERY_SCORE = "/queryscore";
+        public static final String QUERY_APPLYING_MAJOR = "/queryapplyingmajor";
     }
 
     public static class Http {

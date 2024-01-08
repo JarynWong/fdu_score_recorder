@@ -33,4 +33,4 @@ fdu:
   postgraduate:
     year: 2024
     permitsPerSecond: 20
-    ipPermitsPerMin: 5
+    ipPermitsPerMin: 15

@@ -37,6 +37,7 @@ import java.util.stream.Collectors;
 
 import static com.jaryn.recorder.constants.Constant.Cache.APPLYING_MAJOR_ALL_KEY;
 import static com.jaryn.recorder.constants.Constant.Http.*;
+import static com.jaryn.recorder.constants.Constant.SERVICE_CODE.QUERY_APPLYING_MAJOR;
 
 @RestController
 public class ApplyingMajorController {
@@ -44,7 +45,7 @@ public class ApplyingMajorController {
     @Resource
     private ApplyingMajorService applyingMajorService;
 
-    @GetMapping("/applyingMajor")
+    @GetMapping(QUERY_APPLYING_MAJOR)
     public ApplyingMajorResponse getApplyingMajor() {
         return new ApplyingMajorResponse(applyingMajorService.getApplyingMajors());
     }

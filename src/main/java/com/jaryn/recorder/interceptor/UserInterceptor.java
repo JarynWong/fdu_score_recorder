@@ -24,6 +24,7 @@ import java.util.UUID;
 
 import static com.jaryn.recorder.constants.Constant.Http.USER_TOKEN;
 import static com.jaryn.recorder.constants.Constant.SERVICE_CODE.LOGIN;
+import static com.jaryn.recorder.constants.Constant.SERVICE_CODE.QUERY_APPLYING_MAJOR;
 
 @Component
 @Slf4j
@@ -38,10 +39,11 @@ public class UserInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException {
 
-        if (LOGIN.equals(request.getServletPath())) {
+        if (LOGIN.equals(request.getServletPath()) || QUERY_APPLYING_MAJOR.equals(request.getServletPath())) {
             // 登陆不走该拦截器
             return true;
         }
+
         if ("OPTIONS".equals(request.getMethod())) {
             // 预检请求（OPTIONS请求），不走该拦截器，很重要！！！！
             return true;
