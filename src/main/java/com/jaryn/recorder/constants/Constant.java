@@ -36,6 +36,7 @@ public class Constant {
         public static final String APPLYING_MAJOR_KEY = "getApplyingMajor:";
         public static final String APPLYING_MAJOR_ID_KEY = "applyingMajorId:";
         public static final String SCORE_KEY = "score:";
+        public static final String USER_KEY = "user:";
     }
 
     public static class QueryType {
