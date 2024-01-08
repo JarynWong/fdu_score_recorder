@@ -22,7 +22,12 @@ public class FduPostgraduateProperties {
     private int year;
 
     /**
-     * 限流，1秒放行几个请求
+     * 总限流，1秒放行几个请求
      */
     private int permitsPerSecond;
+
+    /**
+     * ip限流，1分钟放行几个请求
+     */
+    private int ipPermitsPerMin;
 }

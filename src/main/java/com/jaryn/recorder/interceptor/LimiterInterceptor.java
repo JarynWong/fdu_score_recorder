@@ -36,17 +36,15 @@ public class LimiterInterceptor implements HandlerInterceptor, InitializingBean 
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        if ("OPTIONS".equals(request.getMethod())) {
+            // 预检请求（OPTIONS请求），不走该拦截器，很重要！！！！
+            return true;
+        }
         if (bucket.tryConsume(1)) {
             return true;
         } else {
             throw new ServiceException("并发限流中，请稍后再试");
         }
-    }
-
-    @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
-        // 请求结束时清除 trace_id
-        MDC.clear();
     }
 
     @Override

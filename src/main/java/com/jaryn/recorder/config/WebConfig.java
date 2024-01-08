@@ -1,5 +1,6 @@
 package com.jaryn.recorder.config;
 
+import com.jaryn.recorder.interceptor.IpLimiterInterceptor;
 import com.jaryn.recorder.interceptor.LoggingInterceptor;
 import com.jaryn.recorder.interceptor.LimiterInterceptor;
 import com.jaryn.recorder.interceptor.UserInterceptor;
@@ -33,12 +34,16 @@ public class WebConfig implements WebMvcConfigurer {
     @Autowired
     private UserInterceptor userInterceptor;
 
+    @Autowired
+    private IpLimiterInterceptor ipLimiterInterceptor;
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         // 注册拦截器
         registry.addInterceptor(loggingInterceptor);
-        registry.addInterceptor(rateLimiterInterceptor);
         registry.addInterceptor(userInterceptor);
+        registry.addInterceptor(rateLimiterInterceptor);
+        registry.addInterceptor(ipLimiterInterceptor);
     }
 
     /**
