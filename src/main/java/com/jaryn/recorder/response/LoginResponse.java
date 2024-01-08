@@ -29,6 +29,11 @@ public class LoginResponse {
     private String applyingMajorName;
 
     /**
+     * 你的总分
+     */
+    private int score;
+
+    /**
      * 你的总分排名
      */
     private int rank;

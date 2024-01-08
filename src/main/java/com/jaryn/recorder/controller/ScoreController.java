@@ -68,8 +68,11 @@ public class ScoreController {
         ScoreQueryResponse response = new ScoreQueryResponse();
         response.setRank(Integer.parseInt(rankStr.toString()));
         response.setScores(overallScoresOrderly);
+        response.setScore(Util.getIntFunctionByQueryType(request.getQueryType()).applyAsInt(userScore));
         // 柱状图
         response.setColumnCharts(userService.obtainColumnCharts(user.getApplyingMajorId(), request.getQueryType(), overallScoresOrderly));
+        // 平均分
+        overallScoresOrderly.add(userService.getAverageScore(overallScoresOrderly));
         return response;
     }
 

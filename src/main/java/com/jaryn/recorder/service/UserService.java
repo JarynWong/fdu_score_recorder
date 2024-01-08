@@ -135,16 +135,26 @@ public class UserService {
         loginResponse.setColumnCharts(obtainColumnCharts(score.getApplyingMajorId(), TOTAL, overallScores));
 
         // 计算平均分
+        OverallScore averageScore = getAverageScore(overallScores);
+        // 最后一个是平均分
+        overallScores.add(averageScore);
+
+        // 总分
+        loginResponse.setScore(Util.getIntFunctionByQueryType(TOTAL).applyAsInt(score));
+        return loginResponse;
+    }
+
+    /**
+     * 获取平均分
+     */
+    public OverallScore getAverageScore(List<OverallScore> overallScores) {
         OverallScore averageScore = new OverallScore();
         averageScore.setPolitics((int) overallScores.stream().mapToInt(OverallScore::getPolitics).average().getAsDouble());
         averageScore.setEnglish((int) overallScores.stream().mapToInt(OverallScore::getEnglish).average().getAsDouble());
         averageScore.setProfessionalCourse1Score((int) overallScores.stream().mapToInt(OverallScore::getProfessionalCourse1Score).average().getAsDouble());
         averageScore.setProfessionalCourse2Score((int) overallScores.stream().mapToInt(OverallScore::getProfessionalCourse2Score).average().getAsDouble());
         averageScore.setTotalScore((int) overallScores.stream().mapToInt(OverallScore::getTotalScore).average().getAsDouble());
-        // 最后一个是平均分
-        overallScores.add(averageScore);
-
-        return loginResponse;
+        return averageScore;
     }
 
 
@@ -215,10 +225,14 @@ public class UserService {
         }
         calculateColumnChartCount(overallScores, maxScoreColumnChart, queryType);
 
-        // 最低分段柱状图计算，321分以下就不统计了
-        int minScore = Math.max(functionByQueryType.applyAsInt(overallScores.get(overallScores.size() - 1)), COLUMN_CHART_MIN_SCORE);
+        // 最低分段柱状图计算，
+        int minScore = functionByQueryType.applyAsInt(overallScores.get(overallScores.size() - 1));
         // minScore = 未出分前的最低分 或 出分后的录取分数(总分才有)
         AdmissionScore admissionScore = scoreService.getAdmissionScore(applyingMajorId);
+        if (TOTAL.equals(queryType)) {
+            // 统计总分时，321分以下就不统计了
+            minScore = Math.max(minScore, COLUMN_CHART_MIN_SCORE);
+        }
         if (admissionScore != null && TOTAL.equals(queryType)) {
             // 出分了
             minScore = admissionScore.getMinScore();

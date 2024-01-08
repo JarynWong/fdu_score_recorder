@@ -38,6 +38,12 @@ public class UserInterceptor implements HandlerInterceptor {
             // 登陆不走该拦截器
             return true;
         }
+        if ("OPTIONS".equals(request.getMethod())) {
+            // 预检请求（OPTIONS请求），不走该拦截器，很重要！！！！
+            return true;
+        }
+
+
 
         boolean hasValid = checkTokenValid(OkHttpUtil.getToken(request));
 
@@ -45,7 +51,7 @@ public class UserInterceptor implements HandlerInterceptor {
             // 如果 cookie 无效或不存在，执行特定操作，如重定向到登录页面
             throw new ServiceException("登陆过期");
         }
-
+        // assembleCookie(response, OkHttpUtil.getToken(request));
         return true;
     }
 
@@ -55,6 +61,29 @@ public class UserInterceptor implements HandlerInterceptor {
             log.info("用户姓名：" + ((UserInfo)user).getName());
         }
         return user != null;
+    }
+
+    /**
+     * 封装ck
+     *
+     * @param response
+     * @param token
+     */
+    private void assembleCookie(HttpServletResponse response, String token) {
+        // 创建一个新的 Cookie 来存储会话 ID
+        Cookie sessionCookie = new Cookie(USER_TOKEN, token);
+        // 设置 cookie 过期时间为 5天
+        sessionCookie.setMaxAge(60 * 60 * 24 * 5);
+        // 防止 JavaScript 访问此 cookie
+        sessionCookie.setHttpOnly(true);
+        // 设置 cookie 应用的路径
+        sessionCookie.setPath("/");
+        // 安全标志，只在HTTPS下发送
+        sessionCookie.setSecure(true);
+        // 将 Cookie 添加到响应中
+        response.addCookie(sessionCookie);
+
+        response.addCookie(new Cookie("SameSite", "None"));
     }
 
 }

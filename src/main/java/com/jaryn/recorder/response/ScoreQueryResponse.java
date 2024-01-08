@@ -19,6 +19,11 @@ import java.util.List;
 public class ScoreQueryResponse {
 
     /**
+     * 你的总分/单科分数
+     */
+    private int score;
+
+    /**
      * 你的总分/单科排名
      */
     private int rank;

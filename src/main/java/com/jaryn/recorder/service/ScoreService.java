@@ -98,6 +98,9 @@ public class ScoreService {
             queryAdmissionScore.setApplyingMajorId(applyingMajorId);
             queryAdmissionScore.setYear(fduPostgraduateProperties.getYear());
             admissionScore = admissionScoreMapper.findOne(queryAdmissionScore);
+            if (admissionScore == null) {
+                return admissionScore;
+            }
             cache.put(applyingMajorIdKey, admissionScore);
         }
         return admissionScore;
