@@ -10,9 +10,24 @@
             <pattern>${ENCODER_PATTERN}</pattern>
         </encoder>
     </appender>
+
+    <!-- 定义一个文件附加器，用于将日志写入文件中 -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>run.log</file> <!-- 日志文件的名称和位置 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 日志文件的日志归档策略 -->
+            <fileNamePattern>myapp-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>2</maxHistory> <!-- 保留最近2天的日志 -->
+        </rollingPolicy>
+        <encoder>
+            <pattern>${ENCODER_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
     <!-- root Logger 配置-->
     <root level="INFO">
         <appender-ref ref="console"></appender-ref>
+        <appender-ref ref="FILE"></appender-ref>
     </root>
 
 
