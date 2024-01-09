@@ -30,4 +30,9 @@ public class FduPostgraduateProperties {
      * ip限流，1分钟放行几个请求
      */
     private int ipPermitsPerMin;
+
+    /**
+     * 前端部署ip，跨域设置用
+     */
+    private String frontEndIp;
 }

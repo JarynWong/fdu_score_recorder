@@ -15,6 +15,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import javax.annotation.Resource;
 import java.util.Collections;
 
 /**
@@ -37,6 +38,9 @@ public class WebConfig implements WebMvcConfigurer {
     @Autowired
     private IpLimiterInterceptor ipLimiterInterceptor;
 
+    @Resource
+    private FduPostgraduateProperties fduPostgraduateProperties;
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         // 注册拦截器
@@ -55,7 +59,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://127.0.0.1:4000")
+                .allowedOrigins(fduPostgraduateProperties.getFrontEndIp())
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true);

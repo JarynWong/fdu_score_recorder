@@ -286,7 +286,7 @@ public class UserService {
         // 设置 cookie 应用的路径
         sessionCookie.setPath("/");
         // 安全标志，只在HTTPS下发送
-        sessionCookie.setSecure(true);
+        // sessionCookie.setSecure(true);
         // 将 Cookie 添加到响应中
         response.addCookie(sessionCookie);
 
@@ -337,6 +337,7 @@ public class UserService {
      * @return
      */
     private void generateVerifyCode(UserInfo user) {
+        Ocr ocr = context.getBean(Ocr.class);
         for (int i = 0; i < VERIFY_CODE_MAX_THRESHOLD; i++) {
             // 获取验证码id_ck
             String cookies = OkHttpUtil.doGet(LOGIN_HTTP);
@@ -345,7 +346,7 @@ public class UserService {
 
             // 绑定验证码id_ck，生成验证码
             File verifyCodeFile = OkHttpUtil.doGetVerifyCode(VERIFY_CODE_HTTP, headers);
-            String verifyCode = context.getBean(Ocr.class).identify(verifyCodeFile).trim();
+            String verifyCode = ocr.identify(verifyCodeFile).trim();
             log.info("识别验证码中...");
             // code 不为4位就重新识别
             // 位数识别正确就直接退出循环，共三次试错机会

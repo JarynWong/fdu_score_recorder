@@ -37,6 +37,9 @@ public class GlobalExceptionHandler {
     }
 
     private void logError(Exception ex) {
+        if (ex.toString().contains("登陆过期")) {
+            return;
+        }
         StackTraceElement[] stackTraceElements = ex.getStackTrace();
         StringBuilder exStr = new StringBuilder(ex.getMessage() + "\n");
         for (StackTraceElement element : stackTraceElements) {

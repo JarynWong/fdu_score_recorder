@@ -1,6 +1,7 @@
 spring:
   datasource:
     username: root
+#    password: FerRuWf1Lk(:
     password: Myx521++
     url: jdbc:mysql://10.162.140.36:3306/fdu_postgraduate_score
     driver-class-name: com.mysql.jdbc.Driver
@@ -34,3 +35,4 @@ fdu:
     year: 2024
     permitsPerSecond: 20
     ipPermitsPerMin: 15
+    frontEndIp: http://127.0.0.1:4000
