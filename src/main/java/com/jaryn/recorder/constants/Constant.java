@@ -21,6 +21,7 @@ public class Constant {
         public static final int LOGIN_MAX_THRESHOLD = 4;
         public static final String VERIFY_CODE_ERROR = "验证码错误";
         public static final String PASSWORD_ERROR = "用户名或密码有误，请重新输入!";
+        public static final String OPEN_TIME_ERROR = "暂未到开放时间!";
         public static final String USER_TOKEN = "USER_TOKEN";
     }
 

@@ -36,3 +36,4 @@ fdu:
     permitsPerSecond: 20
     ipPermitsPerMin: 15
     frontEndIp: http://127.0.0.1:4000
+    tessdataPath: /Users/wangyongjiang/IdeaProjects/fdu_score_recorder/tessdata

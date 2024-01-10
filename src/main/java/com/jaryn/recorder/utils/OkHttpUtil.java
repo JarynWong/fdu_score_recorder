@@ -290,9 +290,11 @@ public class OkHttpUtil {
                 Path tempFile = Files.createTempFile("downloaded_image", ".jpg");
                 Files.write(tempFile, baos.toByteArray());
                 file = tempFile.toFile();
+                log.debug("生成验证码图片路径：{}", file.getAbsolutePath());
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("生成验证码图片出错：{}", e.toString());
+            throw new ServiceException("生成验证码图片出错");
         }
         return file;
     }

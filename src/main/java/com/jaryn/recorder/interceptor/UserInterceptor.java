@@ -61,6 +61,7 @@ public class UserInterceptor implements HandlerInterceptor {
         // ck刷新 + cache刷新
         userService.assembleCookie(response, token);
         cache.put(token, userInfo);
+        log.debug("Cache个数：{}", cache.size());
         return true;
     }
 

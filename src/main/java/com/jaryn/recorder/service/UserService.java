@@ -22,6 +22,8 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
@@ -81,6 +83,13 @@ public class UserService {
         for (int i = 0; i < LOGIN_MAX_THRESHOLD; i++) {
             // 先获取验证码信息
             generateVerifyCode(user);
+            if (user.getValidateCode() == null || user.getValidateCode().length() != 4) {
+                if (i + 1 == LOGIN_MAX_THRESHOLD) {
+                    // 最后一次失败了，让用户重新输入
+                    throw new ServiceException("出现异常！请重新输入信息！");
+                }
+                continue;
+            }
 
             // 开始登陆
             Map<String, String> formMap = new HashMap<>();
@@ -102,7 +111,12 @@ public class UserService {
             } else if (PASSWORD_ERROR.equals(errorInfo)) {
                 // 密码错误
                 throw new ServiceException(errorInfo);
-            } else {
+            }
+            // else if (OPEN_TIME_ERROR.equals(errorInfo)) {
+            //     // 密码错误
+            //     throw new ServiceException(errorInfo);
+            // }
+            else {
                 // 登陆成功，TODO 封装四门单科信息
                 assembleScore(user, websiteRes);
                 user.setPassword(null);
@@ -279,7 +293,7 @@ public class UserService {
     public void assembleCookie(HttpServletResponse response, String token) {
         // 创建一个新的 Cookie 来存储会话 ID
         Cookie sessionCookie = new Cookie(USER_TOKEN, token);
-        // 设置 cookie 过期时间为 5天
+        // 设置 cookie 过期时间为 2天
         sessionCookie.setMaxAge(60 * 60 * 24 * 2);
         // 防止 JavaScript 访问此 cookie
         sessionCookie.setHttpOnly(true);
@@ -345,8 +359,8 @@ public class UserService {
             Map<String, String> headers = OkHttpUtil.getCookieHeaders(cookies);
 
             // 绑定验证码id_ck，生成验证码
-            File verifyCodeFile = OkHttpUtil.doGetVerifyCode(VERIFY_CODE_HTTP, headers);
-            String verifyCode = ocr.identify(verifyCodeFile).trim();
+            String verifyCode = getVerifyCode(ocr, headers);
+
             log.info("识别验证码中...");
             // code 不为4位就重新识别
             // 位数识别正确就直接退出循环，共三次试错机会
@@ -357,5 +371,23 @@ public class UserService {
             }
             log.info("识别验证码失败：{}", verifyCode);
         }
+    }
+
+    /**
+     * 获取图片验证码
+     * @param ocr
+     * @param headers
+     * @return
+     */
+    private String getVerifyCode(Ocr ocr, Map<String, String> headers) {
+        File verifyCodeFile = OkHttpUtil.doGetVerifyCode(VERIFY_CODE_HTTP, headers);
+        String verifyCode = ocr.identify(verifyCodeFile).trim();
+        try {
+            Files.delete(verifyCodeFile.toPath());
+        } catch (IOException e) {
+            log.error("删除图片验证码出错：{}", e.toString());
+            throw new ServiceException("删除图片验证码出错");
+        }
+        return verifyCode;
     }
 }

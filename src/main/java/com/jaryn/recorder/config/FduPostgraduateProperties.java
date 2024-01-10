@@ -35,4 +35,9 @@ public class FduPostgraduateProperties {
      * 前端部署ip，跨域设置用
      */
     private String frontEndIp;
+
+    /**
+     * tessdata路径
+     */
+    private String tessdataPath;
 }
