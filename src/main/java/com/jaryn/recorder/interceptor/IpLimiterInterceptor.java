@@ -56,7 +56,8 @@ public class IpLimiterInterceptor implements HandlerInterceptor {
 
         // 检查请求数量
         if (requestTimestampDeque.size() >= fduPostgraduateProperties.getIpPermitsPerMin()) {
-            throw new ServiceException("IP限流中");
+            throw new ServiceException("操作频繁");
+            // throw new ServiceException("IP限流中");
         }
 
         // 记录请求时间戳

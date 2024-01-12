@@ -1,6 +1,7 @@
 package com.jaryn.recorder.response;
 
 import com.jaryn.recorder.response.pojo.ColumnChart;
+import com.jaryn.recorder.response.pojo.LineChart;
 import com.jaryn.recorder.response.pojo.OverallScore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -47,4 +48,9 @@ public class LoginResponse {
      * 柱状图信息
      */
     private List<ColumnChart> columnCharts;
+
+    /**
+     * 折线图信息
+     */
+    private List<LineChart> lineCharts;
 }

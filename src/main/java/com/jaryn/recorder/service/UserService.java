@@ -10,6 +10,7 @@ import com.jaryn.recorder.exception.ServiceException;
 import com.jaryn.recorder.ocr.Ocr;
 import com.jaryn.recorder.response.LoginResponse;
 import com.jaryn.recorder.response.pojo.ColumnChart;
+import com.jaryn.recorder.response.pojo.LineChart;
 import com.jaryn.recorder.response.pojo.OverallScore;
 import com.jaryn.recorder.utils.OkHttpUtil;
 import com.jaryn.recorder.utils.Util;
@@ -162,6 +163,14 @@ public class UserService {
 
         // 总分
         loginResponse.setScore(Util.getIntFunctionByQueryType(TOTAL).applyAsInt(score));
+
+        // 折线图
+        List<LineChart> lineCharts = scoreService.getAdmissionScores(score.getApplyingMajorId())
+                .stream()
+                .map(admissionScoreInfo -> mapperFacade.map(admissionScoreInfo, LineChart.class))
+                .sorted(Comparator.comparingInt(LineChart::getYear))
+                .collect(Collectors.toList());
+        loginResponse.setLineCharts(lineCharts);
         return loginResponse;
     }
 

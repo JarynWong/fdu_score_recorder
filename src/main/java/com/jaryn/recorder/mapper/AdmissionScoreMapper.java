@@ -8,6 +8,7 @@ import java.util.List;
 // @Mapper
 public interface AdmissionScoreMapper {
 
+    List<AdmissionScore> find(AdmissionScore info);
     AdmissionScore findOne(AdmissionScore info);
 
 }

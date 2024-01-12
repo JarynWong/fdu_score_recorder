@@ -16,4 +16,15 @@
         </where>
     </select>
 
+    <!-- 查询列表 -->
+    <select id="find" parameterType="com.jaryn.recorder.bean.AdmissionScore" resultType="com.jaryn.recorder.bean.AdmissionScore">
+        SELECT * FROM `admission_score`
+        <where>
+            <if test="id != null"> id = #{id} </if>
+            <if test="year != null"> AND year = #{year} </if>
+            <if test="minScore != null"> AND min_score = #{minScore} </if>
+            <if test="applyingMajorId != null"> AND applying_major_id = #{applyingMajorId} </if>
+        </where>
+    </select>
+
 </mapper>

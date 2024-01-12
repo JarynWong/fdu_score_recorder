@@ -87,7 +87,23 @@ public class ScoreService {
     }
 
     /**
-     * 获取录取分数
+     * 获取往年录取分数
+     */
+    public List<AdmissionScore> getAdmissionScores(Integer applyingMajorId) {
+        // 缓存key
+        String applyingMajorIdKey = APPLYING_MAJORS_ID_KEY.concat(String.valueOf(applyingMajorId));
+        List<AdmissionScore> admissionScores = (List<AdmissionScore>)cache.getIfPresent(applyingMajorIdKey);
+        if (Objects.isNull(admissionScores)) {
+            AdmissionScore queryAdmissionScore = new AdmissionScore();
+            queryAdmissionScore.setApplyingMajorId(applyingMajorId);
+            admissionScores = admissionScoreMapper.find(queryAdmissionScore);
+            cache.put(applyingMajorIdKey, admissionScores);
+        }
+        return admissionScores;
+    }
+
+    /**
+     * 获取录取分数列表
      */
     public AdmissionScore getAdmissionScore(Integer applyingMajorId) {
         // 缓存key
