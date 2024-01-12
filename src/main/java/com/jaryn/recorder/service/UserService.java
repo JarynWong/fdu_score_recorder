@@ -144,16 +144,21 @@ public class UserService {
 
         loginResponse.setScores(overallScores);
 
-        loginResponse.setProfessionalCourse1Name(allScores.get(0).getProfessionalCourse1Name());
-        loginResponse.setProfessionalCourse2Name(allScores.get(0).getProfessionalCourse2Name());
+        loginResponse.setProfessionalCourse1Name(score.getProfessionalCourse1Name());
+        loginResponse.setProfessionalCourse2Name(score.getProfessionalCourse2Name());
 
         // 柱状图信息计算
-        loginResponse.setColumnCharts(obtainColumnCharts(score.getApplyingMajorId(), TOTAL, overallScores));
+        AdmissionScore admissionScore = scoreService.getAdmissionScore(score.getApplyingMajorId());
+        loginResponse.setColumnCharts(obtainColumnCharts(TOTAL, overallScores, admissionScore));
 
         // 计算平均分
         OverallScore averageScore = getAverageScore(overallScores);
-        // 最后一个是平均分
+        // 计算过线平均分
+        OverallScore averageOverScore = getAverageOverScore(overallScores, admissionScore);
+        // 最后第二个是平均分
         overallScores.add(averageScore);
+        // 最后一个是过线平均分
+        overallScores.add(averageOverScore);
 
         // 总分
         loginResponse.setScore(Util.getIntFunctionByQueryType(TOTAL).applyAsInt(score));
@@ -171,6 +176,33 @@ public class UserService {
         averageScore.setProfessionalCourse2Score((int) overallScores.stream().mapToInt(OverallScore::getProfessionalCourse2Score).average().getAsDouble());
         averageScore.setTotalScore((int) overallScores.stream().mapToInt(OverallScore::getTotalScore).average().getAsDouble());
         return averageScore;
+    }
+
+    /**
+     * 获取过线平均分，前提是总分平均分大于等于录取平均分
+     * 查询总分才走这个
+     */
+    public OverallScore getAverageOverScore(List<OverallScore> overallScores, AdmissionScore admissionScore) {
+        OverallScore averageOverScore = new OverallScore();
+        if (admissionScore == null) {
+            return averageOverScore;
+        }
+        averageOverScore.setPolitics((int) overallScores.stream()
+                .filter(overallScore -> overallScore.getTotalScore() >= admissionScore.getMinScore())
+                .mapToInt(OverallScore::getPolitics).average().getAsDouble());
+        averageOverScore.setEnglish((int) overallScores.stream()
+                .filter(overallScore -> overallScore.getTotalScore() >= admissionScore.getMinScore())
+                .mapToInt(OverallScore::getEnglish).average().getAsDouble());
+        averageOverScore.setProfessionalCourse1Score((int) overallScores.stream()
+                .filter(overallScore -> overallScore.getTotalScore() >= admissionScore.getMinScore())
+                .mapToInt(OverallScore::getProfessionalCourse1Score).average().getAsDouble());
+        averageOverScore.setProfessionalCourse2Score((int) overallScores.stream()
+                .filter(overallScore -> overallScore.getTotalScore() >= admissionScore.getMinScore())
+                .mapToInt(OverallScore::getProfessionalCourse2Score).average().getAsDouble());
+        averageOverScore.setTotalScore((int) overallScores.stream()
+                .filter(overallScore -> overallScore.getTotalScore() >= admissionScore.getMinScore())
+                .mapToInt(OverallScore::getTotalScore).average().getAsDouble());
+        return averageOverScore;
     }
 
 
@@ -222,7 +254,7 @@ public class UserService {
     /**
      * 获取柱状图
      */
-    public List<ColumnChart> obtainColumnCharts(Integer applyingMajorId, String queryType, List<OverallScore> overallScores) {
+    public List<ColumnChart> obtainColumnCharts(String queryType, List<OverallScore> overallScores, AdmissionScore admissionScore) {
         ToIntFunction<OverallScore> functionByQueryType = Util.getIntFunctionByQueryType(queryType);
 
         List<ColumnChart> columnCharts = new ArrayList<>();
@@ -244,15 +276,15 @@ public class UserService {
         // 最低分段柱状图计算，
         int minScore = functionByQueryType.applyAsInt(overallScores.get(overallScores.size() - 1));
         // minScore = 未出分前的最低分 或 出分后的录取分数(总分才有)
-        AdmissionScore admissionScore = scoreService.getAdmissionScore(applyingMajorId);
         if (TOTAL.equals(queryType)) {
             // 统计总分时，321分以下就不统计了
             minScore = Math.max(minScore, COLUMN_CHART_MIN_SCORE);
+            if (admissionScore != null) {
+                // 出分了
+                minScore = admissionScore.getMinScore();
+            }
         }
-        if (admissionScore != null && TOTAL.equals(queryType)) {
-            // 出分了
-            minScore = admissionScore.getMinScore();
-        }
+
 
         ColumnChart minScoreColumnChart = new ColumnChart();
         minScoreColumnChart.setMin(minScore);
@@ -263,7 +295,9 @@ public class UserService {
             minScoreColumnChart.setMax((minScore / 10 + 1) * 10);
         }
         calculateColumnChartCount(overallScores, minScoreColumnChart, queryType);
-        columnCharts.add(minScoreColumnChart);
+        if (minScore < maxScore) {
+            columnCharts.add(minScoreColumnChart);
+        }
 
         // 中间分段柱状图计算
         int midMin = minScoreColumnChart.getMax() + 1;

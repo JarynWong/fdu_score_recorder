@@ -51,8 +51,6 @@ public class Constant {
     }
 
     public static class Score {
-        // TODO
-        // public static final int COLUMN_CHART_MIN_SCORE = 321;
-        public static final int COLUMN_CHART_MIN_SCORE = 221;
+        public static final int COLUMN_CHART_MIN_SCORE = 321;
     }
 }

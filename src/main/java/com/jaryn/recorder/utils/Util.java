@@ -100,6 +100,14 @@ public class Util {
         return Constant.Strings.EMPTY;
     }
 
+    /**
+     * 判断字符串是不是数字
+     * @param str
+     * @return
+     */
+    public static boolean isNumeric(String str){
+        return str.matches("\\d+");
+    }
 
 
 }

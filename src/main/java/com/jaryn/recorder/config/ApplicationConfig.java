@@ -31,7 +31,7 @@ public class ApplicationConfig {
     public Cache<String, Object> cacheBean() {
         // 创建一个缓存实例，最多100个元素，写入 1 小时后过期
         Cache<String, Object> cache = CacheBuilder.newBuilder()
-                .maximumSize(500)
+                .maximumSize(300)
                 .expireAfterWrite(2, TimeUnit.DAYS)
                 .build();
         return cache;

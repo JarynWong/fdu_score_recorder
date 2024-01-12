@@ -70,9 +70,14 @@ public class ScoreController {
         response.setScores(overallScoresOrderly);
         response.setScore(Util.getIntFunctionByQueryType(request.getQueryType()).applyAsInt(userScore));
         // 柱状图
-        response.setColumnCharts(userService.obtainColumnCharts(user.getApplyingMajorId(), request.getQueryType(), overallScoresOrderly));
+        AdmissionScore admissionScore = scoreService.getAdmissionScore(user.getApplyingMajorId());
+        response.setColumnCharts(userService.obtainColumnCharts(request.getQueryType(), overallScoresOrderly, admissionScore));
         // 平均分
-        overallScoresOrderly.add(userService.getAverageScore(overallScoresOrderly));
+        OverallScore averageScore = userService.getAverageScore(overallScoresOrderly);
+        // 过线平均分
+        OverallScore averageOverScore = userService.getAverageOverScore(overallScoresOrderly, scoreService.getAdmissionScore(user.getApplyingMajorId()));
+        overallScoresOrderly.add(averageScore);
+        overallScoresOrderly.add(averageOverScore);
         return response;
     }
 
