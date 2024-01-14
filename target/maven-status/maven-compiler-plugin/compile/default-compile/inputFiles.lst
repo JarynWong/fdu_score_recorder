@@ -28,6 +28,7 @@
 /Users/wangyongjiang/IdeaProjects/fdu_score_recorder/src/main/java/com/jaryn/recorder/response/ScoreQueryResponse.java
 /Users/wangyongjiang/IdeaProjects/fdu_score_recorder/src/main/java/com/jaryn/recorder/Application.java
 /Users/wangyongjiang/IdeaProjects/fdu_score_recorder/src/main/java/com/jaryn/recorder/bean/UserInfo.java
+/Users/wangyongjiang/IdeaProjects/fdu_score_recorder/src/main/java/com/jaryn/recorder/response/pojo/LineChart.java
 /Users/wangyongjiang/IdeaProjects/fdu_score_recorder/src/main/java/com/jaryn/recorder/service/ScoreService.java
 /Users/wangyongjiang/IdeaProjects/fdu_score_recorder/src/main/java/com/jaryn/recorder/config/WebConfig.java
 /Users/wangyongjiang/IdeaProjects/fdu_score_recorder/src/main/java/com/jaryn/recorder/utils/Util.java

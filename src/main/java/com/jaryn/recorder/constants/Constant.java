@@ -23,6 +23,7 @@ public class Constant {
         public static final String PASSWORD_ERROR = "用户名或密码有误，请重新输入!";
         public static final String OPEN_TIME_ERROR = "暂未到开放时间!";
         public static final String USER_TOKEN = "USER_TOKEN";
+        public static final int MAX_ERROR_CNT = 20;
     }
 
     public static class Strings {
@@ -41,6 +42,7 @@ public class Constant {
         public static final String SCORE_KEY = "score:";
         public static final String USER_KEY = "user:";
         public static final String IP_KEY = "ip:";
+        public static final String PASSWORD_ERROR = "passwordError:";
     }
 
     public static class QueryType {

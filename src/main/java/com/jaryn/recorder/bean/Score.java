@@ -3,7 +3,6 @@ package com.jaryn.recorder.bean;
 import com.jaryn.recorder.constants.Constant;
 import com.jaryn.recorder.response.pojo.OverallScore;
 import com.jaryn.recorder.utils.Util;
-import com.sun.deploy.util.StringUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

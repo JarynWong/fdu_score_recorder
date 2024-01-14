@@ -5,6 +5,7 @@ import com.jaryn.recorder.bean.AdmissionScore;
 import com.jaryn.recorder.bean.ApplyingMajor;
 import com.jaryn.recorder.bean.Score;
 import com.jaryn.recorder.bean.UserInfo;
+import com.jaryn.recorder.config.FduPostgraduateProperties;
 import com.jaryn.recorder.constants.Constant;
 import com.jaryn.recorder.exception.ServiceException;
 import com.jaryn.recorder.ocr.Ocr;
@@ -20,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -29,6 +31,7 @@ import java.util.*;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
+import static com.jaryn.recorder.constants.Constant.Cache.USER_KEY;
 import static com.jaryn.recorder.constants.Constant.Http.*;
 import static com.jaryn.recorder.constants.Constant.QueryType.TOTAL;
 import static com.jaryn.recorder.constants.Constant.Score.COLUMN_CHART_MIN_SCORE;
@@ -57,21 +60,42 @@ public class UserService {
     @Autowired
     private Cache<String, Object> cache;
 
+    @Resource
+    private FduPostgraduateProperties fduPostgraduateProperties;
+
     /**
      * 登陆
      *
      * @param user
      */
     public LoginResponse login(UserInfo user) {
-        if (user.getApplyingMajorId() == null || user.getUsername() == null || user.getPassword() == null) {
-            throw new ServiceException("参数错误");
-        }
+        checkParam(user);
         log.info("开始登陆，登陆用户名：{}", user.getUsername());
         // 登陆并将信息封装到user
         login4AssembleUser(user);
         // 登陆成功后将用户的四门成绩入库
         Score score = scoreService.saveScore(user);
         return getLoginResponse(score);
+    }
+
+    /**
+     * 检测参数
+     * @param user
+     */
+    private void checkParam(UserInfo user) {
+        if (user.getApplyingMajorId() == null || user.getUsername() == null || user.getPassword() == null) {
+            throw new ServiceException("参数错误");
+        }
+        if (user.getUsername().length() < 6 || user.getPassword().length() < 6 || !Util.isNumeric(user.getUsername())) {
+            throw new ServiceException("用户名或密码错误");
+        }
+        String key = PASSWORD_ERROR
+                .concat(user.getUsername())
+                .concat(String.valueOf(fduPostgraduateProperties.getYear()));
+        Integer errorCnt = (Integer) cache.getIfPresent(key);
+        if (errorCnt != null && errorCnt > MAX_ERROR_CNT) {
+            throw new ServiceException("用户名或密码错误次数过多，请1-2天后重试");
+        }
     }
 
     /**
@@ -102,6 +126,9 @@ public class UserService {
             websiteRes = OkHttpUtil.doFormBodyPost(LOGIN_HTTP, formMap, headers);
 
             String errorInfo = Util.getErrorInfo(websiteRes);
+            String passwordErrorCntKey = PASSWORD_ERROR
+                    .concat(user.getUsername())
+                    .concat(String.valueOf(fduPostgraduateProperties.getYear()));
             if (VERIFY_CODE_ERROR.equals(errorInfo)) {
                 // 验证码错误，继续重试
                 log.error("验证码错误，错误次数 : {}", i + 1);
@@ -110,17 +137,27 @@ public class UserService {
                     throw new ServiceException("出现异常！请重新输入信息！");
                 }
             } else if (PASSWORD_ERROR.equals(errorInfo)) {
-                // 密码错误
+                // 密码错误五次以上冻结
+                Integer errorCnt = (Integer) cache.getIfPresent(passwordErrorCntKey);
+                if (errorCnt == null) {
+                    errorCnt = 0;
+                }
+                cache.put(passwordErrorCntKey, ++errorCnt);
                 throw new ServiceException(errorInfo);
             }
             // else if (OPEN_TIME_ERROR.equals(errorInfo)) {
-            //     // 密码错误
+            //     // 未开放 TODO
             //     throw new ServiceException(errorInfo);
             // }
             else {
                 // 登陆成功，TODO 封装四门单科信息
                 assembleScore(user, websiteRes);
                 user.setPassword(null);
+                // 清空密码错误次数
+                Integer errorCnt = (Integer) cache.getIfPresent(passwordErrorCntKey);
+                if (errorCnt != null) {
+                    cache.invalidate(passwordErrorCntKey);
+                }
                 break;
             }
         }
