@@ -12,6 +12,7 @@ public class Constant {
         public static final String CHECK_STATE = "/checkstate";
         public static final String QUERY_SCORE = "/queryscore";
         public static final String QUERY_APPLYING_MAJOR = "/queryapplyingmajor";
+        public static final String QUERY_EXAMINEE_EXIST = "/queryexamineeexist";
     }
 
     public static class Http {
@@ -24,6 +25,7 @@ public class Constant {
         public static final String OPEN_TIME_ERROR = "暂未到开放时间!";
         public static final String USER_TOKEN = "USER_TOKEN";
         public static final int MAX_ERROR_CNT = 20;
+        public static final int MAX_ADD_GROUP_FAIL_CNT = 8;
     }
 
     public static class Strings {
@@ -43,6 +45,8 @@ public class Constant {
         public static final String USER_KEY = "user:";
         public static final String IP_KEY = "ip:";
         public static final String PASSWORD_ERROR = "passwordError:";
+        public static final String QUERY_EXAMINEE_FAIL = "examineeError:";
+        public static final String EXAMINEE_KEY = "examinee:";
     }
 
     public static class QueryType {

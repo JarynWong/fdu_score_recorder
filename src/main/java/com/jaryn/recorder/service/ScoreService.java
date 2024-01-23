@@ -46,24 +46,13 @@ public class ScoreService {
      * 非首次则不用走这一步
      */
     public Score saveScore(UserInfo user) {
-        // 加入缓存
+        // 查缓存和库
         String key = SCORE_KEY
                 .concat(user.getAdmissionTicket())
                 .concat(user.getName())
                 .concat(String.valueOf(fduPostgraduateProperties.getYear()));
-        Score score = (Score)cache.getIfPresent(key);
+        Score score = getScore(user, key);
         if (score != null) {
-            return score;
-        }
-        // 缓存找不到就数据库查一下，再放入缓存
-        Score queryScore = new Score();
-        queryScore.setAdmissionTicket(user.getAdmissionTicket());
-        queryScore.setYear(fduPostgraduateProperties.getYear());
-        queryScore.setName(user.getName());
-        score = scoreMapper.findOne(queryScore);
-        if (score != null) {
-            // 用户非首次登陆
-            cache.put(key, score);
             return score;
         }
 
@@ -74,6 +63,32 @@ public class ScoreService {
         scoreMapper.create(score);
         cache.put(key, score);
         return score;
+    }
+
+    /**
+     * 在缓存/数据库中尝试获取用户之前录分的信息
+     * @param user
+     * @param key
+     * @return
+     */
+    public Score getScore(UserInfo user, String key) {
+        Score score = (Score)cache.getIfPresent(key);
+        if (score != null) {
+            return score;
+        }
+        // 缓存找不到就数据库查一下，再放入缓存
+        Score queryScore = new Score();
+        queryScore.setAdmissionTicket(user.getAdmissionTicket());
+        queryScore.setUsername(user.getUsername());
+        queryScore.setYear(fduPostgraduateProperties.getYear());
+        queryScore.setName(user.getName());
+        score = scoreMapper.findOne(queryScore);
+        if (score != null) {
+            // 用户非首次登陆
+            cache.put(key, score);
+            return score;
+        }
+        return null;
     }
 
     /**

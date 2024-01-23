@@ -20,8 +20,8 @@ public class UserInfo {
      * type=2为研究生初试成绩查询.其他为博士成绩等
      */
     private String type = "2";
-    private String username = "12345677";
-    private String password = "asdasdasd";
+    private String username;
+    private String password;
     private String validateCode;
     private String cookies;
 

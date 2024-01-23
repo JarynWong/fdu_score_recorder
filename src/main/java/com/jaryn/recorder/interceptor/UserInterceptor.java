@@ -23,8 +23,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 import static com.jaryn.recorder.constants.Constant.Http.USER_TOKEN;
-import static com.jaryn.recorder.constants.Constant.SERVICE_CODE.LOGIN;
-import static com.jaryn.recorder.constants.Constant.SERVICE_CODE.QUERY_APPLYING_MAJOR;
+import static com.jaryn.recorder.constants.Constant.SERVICE_CODE.*;
 
 @Component
 @Slf4j
@@ -39,7 +38,7 @@ public class UserInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws IOException {
 
-        if (LOGIN.equals(request.getServletPath()) || QUERY_APPLYING_MAJOR.equals(request.getServletPath())) {
+        if (LOGIN.equals(request.getServletPath()) || QUERY_APPLYING_MAJOR.equals(request.getServletPath()) || QUERY_EXAMINEE_EXIST.equals(request.getServletPath())) {
             // 登陆不走该拦截器
             return true;
         }

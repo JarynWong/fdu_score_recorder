@@ -93,8 +93,8 @@ public class UserService {
                 .concat(user.getUsername())
                 .concat(String.valueOf(fduPostgraduateProperties.getYear()));
         Integer errorCnt = (Integer) cache.getIfPresent(key);
-        if (errorCnt != null && errorCnt > MAX_ERROR_CNT) {
-            throw new ServiceException("用户名或密码错误次数过多，请1-2天后重试");
+        if (errorCnt != null && errorCnt >= MAX_ERROR_CNT) {
+            throw new ServiceException("密码错误次数过多，请1-2天后重试");
         }
     }
 
@@ -126,7 +126,7 @@ public class UserService {
             websiteRes = OkHttpUtil.doFormBodyPost(LOGIN_HTTP, formMap, headers);
 
             String errorInfo = Util.getErrorInfo(websiteRes);
-            String passwordErrorCntKey = PASSWORD_ERROR
+            String passwordErrorCntKey = Constant.Cache.PASSWORD_ERROR
                     .concat(user.getUsername())
                     .concat(String.valueOf(fduPostgraduateProperties.getYear()));
             if (VERIFY_CODE_ERROR.equals(errorInfo)) {
@@ -146,7 +146,7 @@ public class UserService {
                 throw new ServiceException(errorInfo);
             }
             // else if (OPEN_TIME_ERROR.equals(errorInfo)) {
-            //     // 未开放 TODO
+            //     // 未开放 TODO 开放了就直接删除
             //     throw new ServiceException(errorInfo);
             // }
             else {
