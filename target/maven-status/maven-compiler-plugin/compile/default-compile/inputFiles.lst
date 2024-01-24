@@ -7,6 +7,8 @@
 /Users/wangyongjiang/IdeaProjects/fdu_score_recorder/src/main/java/com/jaryn/recorder/request/LoginRequest.java
 /Users/wangyongjiang/IdeaProjects/fdu_score_recorder/src/main/java/com/jaryn/recorder/config/DruidConfig.java
 /Users/wangyongjiang/IdeaProjects/fdu_score_recorder/src/main/java/com/jaryn/recorder/response/pojo/OverallScore.java
+/Users/wangyongjiang/IdeaProjects/fdu_score_recorder/src/main/java/com/jaryn/recorder/request/ExamineeQueryRequest.java
+/Users/wangyongjiang/IdeaProjects/fdu_score_recorder/src/main/java/com/jaryn/recorder/controller/BotController.java
 /Users/wangyongjiang/IdeaProjects/fdu_score_recorder/src/main/java/com/jaryn/recorder/response/LoginResponse.java
 /Users/wangyongjiang/IdeaProjects/fdu_score_recorder/src/main/java/com/jaryn/recorder/bean/ApplyingMajor.java
 /Users/wangyongjiang/IdeaProjects/fdu_score_recorder/src/main/java/com/jaryn/recorder/mapper/ScoreMapper.java
@@ -16,6 +18,7 @@
 /Users/wangyongjiang/IdeaProjects/fdu_score_recorder/src/main/java/com/jaryn/recorder/interceptor/LimiterInterceptor.java
 /Users/wangyongjiang/IdeaProjects/fdu_score_recorder/src/main/java/com/jaryn/recorder/service/ApplyingMajorService.java
 /Users/wangyongjiang/IdeaProjects/fdu_score_recorder/src/main/java/com/jaryn/recorder/exception/ServiceExceptionInfo.java
+/Users/wangyongjiang/IdeaProjects/fdu_score_recorder/src/main/java/com/jaryn/recorder/response/ExamineeQueryResponse.java
 /Users/wangyongjiang/IdeaProjects/fdu_score_recorder/src/main/java/com/jaryn/recorder/config/ApplicationConfig.java
 /Users/wangyongjiang/IdeaProjects/fdu_score_recorder/src/main/java/com/jaryn/recorder/config/JacksonConfig.java
 /Users/wangyongjiang/IdeaProjects/fdu_score_recorder/src/main/java/com/jaryn/recorder/constants/Constant.java

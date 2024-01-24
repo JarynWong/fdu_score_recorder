@@ -92,6 +92,18 @@ public class ScoreService {
     }
 
     /**
+     * 在数据库中尝试获取用户之前录分的信息
+     * @return
+     */
+    public Score getScoreBot(String username) {
+        // 缓存找不到就数据库查一下，再放入缓存
+        Score queryScore = new Score();
+        queryScore.setUsername(username);
+        queryScore.setYear(fduPostgraduateProperties.getYear());
+        return scoreMapper.findOne(queryScore);
+    }
+
+    /**
      * 获取分数列表
      */
     public List<Score> getScores(Integer applyingMajorId) {

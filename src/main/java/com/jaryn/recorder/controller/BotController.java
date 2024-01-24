@@ -13,6 +13,7 @@ import com.jaryn.recorder.response.LoginResponse;
 import com.jaryn.recorder.service.ScoreService;
 import com.jaryn.recorder.service.UserService;
 import com.jaryn.recorder.utils.OkHttpUtil;
+import com.jaryn.recorder.utils.Util;
 import ma.glasnost.orika.MapperFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,27 +46,35 @@ public class BotController {
     public ExamineeQueryResponse queryExamineeExist(@RequestBody ExamineeQueryRequest request) {
         // 检测考生编号是否被别人使用
         String examineeNumKey = EXAMINEE_KEY.concat(request.getExamineeNum());
-        checkExamineeNum(examineeNumKey);
+        checkExamineeNum(request, examineeNumKey);
 
-        UserInfo user = new UserInfo();
-        user.setUsername(request.getExamineeNum());
-        Score score = scoreService.getScore(user, SCORE_KEY
-                .concat(request.getExamineeNum())
-                .concat(String.valueOf(fduPostgraduateProperties.getYear())));
+        Score score = scoreService.getScoreBot(request.getExamineeNum());
 
         boolean isExist = score != null;
         checkFailCnt(request, isExist, examineeNumKey);
-        return new ExamineeQueryResponse(isExist);
+        if (!isExist) {
+            throw new ServiceException("请先进行录分");
+        }
+        return new ExamineeQueryResponse(true);
     }
 
     /**
      * 检测考生编号是否被别人使用
-     * @param examineeNumKey
      */
-    private void checkExamineeNum(String examineeNumKey) {
+    private void checkExamineeNum(ExamineeQueryRequest request, String examineeNumKey) {
+        if (request.getExamineeNum().length() < 6) {
+            throw new ServiceException("请先进行录分");
+        }
         String qq = (String) cache.getIfPresent(examineeNumKey);
         if (qq != null) {
-            throw new ServiceException("考生编号已被他人使用，QQ：" + qq);
+            throw new ServiceException("编号已被使用," + qq);
+        }
+        String examineeFailCntKey = QUERY_EXAMINEE_FAIL
+                .concat(request.getQq())
+                .concat(String.valueOf(fduPostgraduateProperties.getYear()));
+        Integer failCnt = (Integer) cache.getIfPresent(examineeFailCntKey);
+        if (failCnt != null && failCnt >= MAX_ADD_GROUP_FAIL_CNT) {
+            throw new ServiceException("过多尝试，请1-2天后重试");
         }
     }
 
@@ -82,8 +91,6 @@ public class BotController {
             Integer failCnt = (Integer) cache.getIfPresent(examineeFailCntKey);
             if (failCnt == null) {
                 failCnt = 0;
-            } else if (failCnt >= MAX_ADD_GROUP_FAIL_CNT) {
-                throw new ServiceException("过多尝试，请1-2天后重试");
             }
             cache.put(examineeFailCntKey, ++failCnt);
         } else {
