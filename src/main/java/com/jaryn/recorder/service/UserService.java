@@ -292,9 +292,18 @@ public class UserService {
         }
         // i = 0的情况没考虑，最高分，第一名
         if (functionByQueryType.applyAsInt(score) == functionByQueryType.applyAsInt(overallScores.get(0))) {
-            rankStr.append(1);
+            // 这里的代码表示将rankStr设为1，防止与上面的rankStr.append(rank)冲突
+            rankStr.setLength(1);
+            rankStr.setCharAt(0, '1');
         }
         return overallScores;
+    }
+
+    public static void main(String[] args) {
+        StringBuilder rankStr = new StringBuilder();
+        rankStr.setLength(1);
+        rankStr.setCharAt(0, '1');
+        System.err.println(rankStr);
     }
 
     /**
