@@ -43,6 +43,7 @@ public class Constant {
         public static final String APPLYING_MAJORS_ID_KEY = "applyingMajorsId:";
         public static final String SCORE_KEY = "score:";
         public static final String USER_KEY = "user:";
+        public static final String TOKEN_KEY = "token:";
         public static final String IP_KEY = "ip:";
         public static final String PASSWORD_ERROR = "passwordError:";
         public static final String QUERY_EXAMINEE_FAIL = "examineeError:";

@@ -10,6 +10,7 @@ import com.jaryn.recorder.bean.UserInfo;
 import com.jaryn.recorder.exception.ServiceException;
 import com.jaryn.recorder.service.UserService;
 import com.jaryn.recorder.utils.OkHttpUtil;
+import com.jaryn.recorder.utils.RedisUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ import static com.jaryn.recorder.constants.Constant.SERVICE_CODE.*;
 public class UserInterceptor implements HandlerInterceptor {
 
     @Autowired
-    private Cache<String, Object> cache;
+    private RedisUtils redisUtils;
 
     @Autowired
     private UserService userService;
@@ -50,7 +51,7 @@ public class UserInterceptor implements HandlerInterceptor {
 
 
         String token = OkHttpUtil.getToken(request);
-        Object userInfo = getUserInfo(token);
+        UserInfo userInfo = getUserInfo(token);
         boolean hasValid = userInfo != null;
 
         if (!hasValid) {
@@ -59,15 +60,15 @@ public class UserInterceptor implements HandlerInterceptor {
         }
         // ck刷新 + cache刷新
         userService.assembleCookie(response, token);
-        cache.put(token, userInfo);
-        log.debug("Cache个数：{}", cache.size());
+        redisUtils.put(token, userInfo);
+        // log.debug("Cache个数：{}", cache.size());
         return true;
     }
 
-    private Object getUserInfo(String token) {
-        Object user = cache.getIfPresent(token);
+    private UserInfo getUserInfo(String token) {
+        UserInfo user = redisUtils.get(token, UserInfo.class);
         if (user != null) {
-            log.info("用户姓名：" + ((UserInfo)user).getName());
+            log.info("用户姓名：" + user.getName());
         }
         return user;
     }

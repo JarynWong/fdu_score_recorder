@@ -13,6 +13,7 @@ import com.jaryn.recorder.response.LoginResponse;
 import com.jaryn.recorder.service.ScoreService;
 import com.jaryn.recorder.service.UserService;
 import com.jaryn.recorder.utils.OkHttpUtil;
+import com.jaryn.recorder.utils.RedisUtils;
 import com.jaryn.recorder.utils.Util;
 import ma.glasnost.orika.MapperFacade;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +38,7 @@ public class BotController {
     private ScoreService scoreService;
 
     @Autowired
-    private Cache<String, Object> cache;
+    private RedisUtils redisUtils;
 
     @Resource
     private FduPostgraduateProperties fduPostgraduateProperties;
@@ -65,14 +66,14 @@ public class BotController {
         if (request.getExamineeNum().length() < 6) {
             throw new ServiceException("请先进行录分");
         }
-        String qq = (String) cache.getIfPresent(examineeNumKey);
+        String qq = redisUtils.get(examineeNumKey, String.class);
         if (qq != null) {
             throw new ServiceException("编号已被使用," + qq);
         }
         String examineeFailCntKey = QUERY_EXAMINEE_FAIL
                 .concat(request.getQq())
                 .concat(String.valueOf(fduPostgraduateProperties.getYear()));
-        Integer failCnt = (Integer) cache.getIfPresent(examineeFailCntKey);
+        Integer failCnt = redisUtils.get(examineeFailCntKey, Integer.class);
         if (failCnt != null && failCnt >= MAX_ADD_GROUP_FAIL_CNT) {
             throw new ServiceException("过多尝试，请1-2天后重试");
         }
@@ -88,19 +89,19 @@ public class BotController {
                 .concat(request.getQq())
                 .concat(String.valueOf(fduPostgraduateProperties.getYear()));
         if (!isExist) {
-            Integer failCnt = (Integer) cache.getIfPresent(examineeFailCntKey);
+            Integer failCnt = redisUtils.get(examineeFailCntKey, Integer.class);
             if (failCnt == null) {
                 failCnt = 0;
             }
-            cache.put(examineeFailCntKey, ++failCnt);
+            redisUtils.put(examineeFailCntKey, ++failCnt, 30 * 24 * 60 * 60);
         } else {
             // 清空原有失败次数的cache
-            Integer failCnt = (Integer) cache.getIfPresent(examineeFailCntKey);
+            Integer failCnt = redisUtils.get(examineeFailCntKey, Integer.class);
             if (failCnt != null) {
-                cache.invalidate(examineeFailCntKey);
+                redisUtils.invalidate(examineeFailCntKey);
             }
             // 加入 考生编号 - qq缓存
-            cache.put(examineeNumKey, request.getQq());
+            redisUtils.put(examineeNumKey, request.getQq(), 30 * 24 * 60 * 60);
         }
     }
 

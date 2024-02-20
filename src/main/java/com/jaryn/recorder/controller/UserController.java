@@ -11,6 +11,7 @@ import com.jaryn.recorder.response.LoginResponse;
 import com.jaryn.recorder.service.ScoreService;
 import com.jaryn.recorder.service.UserService;
 import com.jaryn.recorder.utils.OkHttpUtil;
+import com.jaryn.recorder.utils.RedisUtils;
 import ma.glasnost.orika.MapperFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,7 +44,7 @@ public class UserController {
     private MapperFacade mapperFacade;
 
     @Autowired
-    private Cache<String, Object> cache;
+    private RedisUtils redisUtils;
 
     @Resource
     private FduPostgraduateProperties fduPostgraduateProperties;
@@ -51,7 +52,7 @@ public class UserController {
     @GetMapping(CHECK_STATE)
     public LoginResponse checkState(HttpServletRequest request) {
         String token = OkHttpUtil.getToken(request);
-        UserInfo user = (UserInfo) cache.getIfPresent(token);
+        UserInfo user = redisUtils.get(token, UserInfo.class);
         // 未过期则直接获取分数等信息
         Score score = scoreService.saveScore(user);
         return userService.getLoginResponse(score);
@@ -77,16 +78,16 @@ public class UserController {
                 .concat(user.getAdmissionTicket())
                 .concat(user.getName())
                 .concat(String.valueOf(fduPostgraduateProperties.getYear()));
-        String oldToken = (String)cache.getIfPresent(key);
+        String oldToken = redisUtils.get(key, String.class);
         if (StringUtil.isNotEmpty(oldToken)) {
             // 在cache删除user信息，那么其他处的ck就失效了
-            cache.invalidate(oldToken);
+            redisUtils.invalidate(oldToken);
         }
 
         String token = UUID.randomUUID().toString();
         // 第一个用于存储用户token和信息，第二个用于防止多地登陆
-        cache.put(token, user);
-        cache.put(key, token);
+        redisUtils.put(token, user);
+        redisUtils.put(key, token);
         userService.assembleCookie(response, token);
     }
 

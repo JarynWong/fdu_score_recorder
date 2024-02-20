@@ -23,6 +23,7 @@
 /Users/wangyongjiang/IdeaProjects/fdu_score_recorder/src/main/java/com/jaryn/recorder/config/JacksonConfig.java
 /Users/wangyongjiang/IdeaProjects/fdu_score_recorder/src/main/java/com/jaryn/recorder/constants/Constant.java
 /Users/wangyongjiang/IdeaProjects/fdu_score_recorder/src/main/java/com/jaryn/recorder/exception/ServiceException.java
+/Users/wangyongjiang/IdeaProjects/fdu_score_recorder/src/main/java/com/jaryn/recorder/utils/RedisUtils.java
 /Users/wangyongjiang/IdeaProjects/fdu_score_recorder/src/main/java/com/jaryn/recorder/utils/OkHttpUtil.java
 /Users/wangyongjiang/IdeaProjects/fdu_score_recorder/src/main/java/com/jaryn/recorder/interceptor/LoggingInterceptor.java
 /Users/wangyongjiang/IdeaProjects/fdu_score_recorder/src/main/java/com/jaryn/recorder/interceptor/UserInterceptor.java

@@ -14,6 +14,7 @@ import com.jaryn.recorder.response.pojo.ColumnChart;
 import com.jaryn.recorder.response.pojo.LineChart;
 import com.jaryn.recorder.response.pojo.OverallScore;
 import com.jaryn.recorder.utils.OkHttpUtil;
+import com.jaryn.recorder.utils.RedisUtils;
 import com.jaryn.recorder.utils.Util;
 import lombok.extern.slf4j.Slf4j;
 import ma.glasnost.orika.MapperFacade;
@@ -58,7 +59,7 @@ public class UserService {
     private MapperFacade mapperFacade;
 
     @Autowired
-    private Cache<String, Object> cache;
+    private RedisUtils redisUtils;
 
     @Resource
     private FduPostgraduateProperties fduPostgraduateProperties;
@@ -92,7 +93,7 @@ public class UserService {
         String key = PASSWORD_ERROR
                 .concat(user.getUsername())
                 .concat(String.valueOf(fduPostgraduateProperties.getYear()));
-        Integer errorCnt = (Integer) cache.getIfPresent(key);
+        Integer errorCnt = redisUtils.get(key, Integer.class);
         if (errorCnt != null && errorCnt >= MAX_ERROR_CNT) {
             throw new ServiceException("密码错误次数过多，请1-2天后重试");
         }
@@ -138,11 +139,11 @@ public class UserService {
                 }
             } else if (PASSWORD_ERROR.equals(errorInfo)) {
                 // 密码错误五次以上冻结
-                Integer errorCnt = (Integer) cache.getIfPresent(passwordErrorCntKey);
+                Integer errorCnt = redisUtils.get(passwordErrorCntKey, Integer.class);
                 if (errorCnt == null) {
                     errorCnt = 0;
                 }
-                cache.put(passwordErrorCntKey, ++errorCnt);
+                redisUtils.put(passwordErrorCntKey, ++errorCnt);
                 throw new ServiceException(errorInfo);
             }
             // else if (OPEN_TIME_ERROR.equals(errorInfo)) {
@@ -154,9 +155,9 @@ public class UserService {
                 assembleScore(user, websiteRes);
                 user.setPassword(null);
                 // 清空密码错误次数
-                Integer errorCnt = (Integer) cache.getIfPresent(passwordErrorCntKey);
+                Integer errorCnt = redisUtils.get(passwordErrorCntKey, Integer.class);
                 if (errorCnt != null) {
-                    cache.invalidate(passwordErrorCntKey);
+                    redisUtils.invalidate(passwordErrorCntKey);
                 }
                 break;
             }

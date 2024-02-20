@@ -8,6 +8,7 @@ package com.jaryn.recorder.interceptor;
 import com.google.common.cache.Cache;
 import com.jaryn.recorder.config.FduPostgraduateProperties;
 import com.jaryn.recorder.exception.ServiceException;
+import com.jaryn.recorder.utils.RedisUtils;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.Bucket4j;
@@ -28,8 +29,11 @@ import static com.jaryn.recorder.constants.Constant.Cache.IP_KEY;
 @Component
 public class IpLimiterInterceptor implements HandlerInterceptor {
 
+    // @Autowired
+    // private Cache<String, Object> cache;
+
     @Autowired
-    private Cache<String, Object> cache;
+    private RedisUtils redisUtils;
 
     @Autowired
     private FduPostgraduateProperties fduPostgraduateProperties;
@@ -41,10 +45,9 @@ public class IpLimiterInterceptor implements HandlerInterceptor {
             return true;
         }
         String ipKey = IP_KEY.concat(request.getRemoteHost());
-        ConcurrentLinkedDeque<Long> requestTimestampDeque = (ConcurrentLinkedDeque<Long>)cache.getIfPresent(ipKey);
+        ConcurrentLinkedDeque<Long> requestTimestampDeque = redisUtils.get(ipKey, ConcurrentLinkedDeque.class);
         if (requestTimestampDeque == null) {
             requestTimestampDeque = new ConcurrentLinkedDeque<>();
-            cache.put(ipKey, requestTimestampDeque);
         }
 
         long currentTimestamp = System.currentTimeMillis();
@@ -62,6 +65,7 @@ public class IpLimiterInterceptor implements HandlerInterceptor {
 
         // 记录请求时间戳
         requestTimestampDeque.offer(currentTimestamp);
+        redisUtils.put(ipKey, requestTimestampDeque);
         return true;
     }
 

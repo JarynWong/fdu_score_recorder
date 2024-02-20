@@ -15,6 +15,7 @@ import com.jaryn.recorder.response.pojo.ColumnChart;
 import com.jaryn.recorder.response.pojo.OverallScore;
 import com.jaryn.recorder.service.UserService;
 import com.jaryn.recorder.utils.OkHttpUtil;
+import com.jaryn.recorder.utils.RedisUtils;
 import com.jaryn.recorder.utils.Util;
 import ma.glasnost.orika.MapperFacade;
 import org.slf4j.Logger;
@@ -30,6 +31,7 @@ import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.jaryn.recorder.constants.Constant.Cache.TOKEN_KEY;
 import static com.jaryn.recorder.constants.Constant.Http.*;
 import static com.jaryn.recorder.constants.Constant.QueryType.*;
 import static com.jaryn.recorder.constants.Constant.SERVICE_CODE.LOGIN;
@@ -48,7 +50,7 @@ public class ScoreController {
     private MapperFacade mapperFacade;
 
     @Autowired
-    private Cache<String, Object> cache;
+    private RedisUtils redisUtils;
 
     /**
      * 查分
@@ -57,7 +59,7 @@ public class ScoreController {
     @PostMapping(QUERY_SCORE)
     public ScoreQueryResponse queryScore(@RequestBody ScoreQueryRequest request, HttpServletRequest servletRequest) {
         String token = OkHttpUtil.getToken(servletRequest);
-        UserInfo user = (UserInfo) cache.getIfPresent(token);
+        UserInfo user = redisUtils.get(token, UserInfo.class);
 
         List<Score> scores = scoreService.getScores(user.getApplyingMajorId());
         Score userScore = scoreService.saveScore(user);

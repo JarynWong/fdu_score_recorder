@@ -7,11 +7,13 @@ import com.jaryn.recorder.bean.UserInfo;
 import com.jaryn.recorder.config.FduPostgraduateProperties;
 import com.jaryn.recorder.mapper.AdmissionScoreMapper;
 import com.jaryn.recorder.mapper.ScoreMapper;
+import com.jaryn.recorder.utils.RedisUtils;
 import ma.glasnost.orika.MapperFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -38,7 +40,7 @@ public class ScoreService {
     private MapperFacade mapperFacade;
 
     @Autowired
-    private Cache<String, Object> cache;
+    private RedisUtils redisUtils;
 
     /**
      * 保存分数
@@ -61,7 +63,7 @@ public class ScoreService {
         score.setYear(fduPostgraduateProperties.getYear());
         score.calculateTotalScore();
         scoreMapper.create(score);
-        cache.put(key, score);
+        redisUtils.put(key, score);
         return score;
     }
 
@@ -72,7 +74,7 @@ public class ScoreService {
      * @return
      */
     public Score getScore(UserInfo user, String key) {
-        Score score = (Score)cache.getIfPresent(key);
+        Score score = redisUtils.get(key, Score.class);
         if (score != null) {
             return score;
         }
@@ -85,7 +87,7 @@ public class ScoreService {
         score = scoreMapper.findOne(queryScore);
         if (score != null) {
             // 用户非首次登陆
-            cache.put(key, score);
+            redisUtils.put(key, score);
             return score;
         }
         return null;
@@ -119,12 +121,12 @@ public class ScoreService {
     public List<AdmissionScore> getAdmissionScores(Integer applyingMajorId) {
         // 缓存key
         String applyingMajorIdKey = APPLYING_MAJORS_ID_KEY.concat(String.valueOf(applyingMajorId));
-        List<AdmissionScore> admissionScores = (List<AdmissionScore>)cache.getIfPresent(applyingMajorIdKey);
+        List<AdmissionScore> admissionScores = redisUtils.getList(applyingMajorIdKey, AdmissionScore.class);
         if (Objects.isNull(admissionScores)) {
             AdmissionScore queryAdmissionScore = new AdmissionScore();
             queryAdmissionScore.setApplyingMajorId(applyingMajorId);
             admissionScores = admissionScoreMapper.find(queryAdmissionScore);
-            cache.put(applyingMajorIdKey, admissionScores);
+            redisUtils.put(applyingMajorIdKey, admissionScores);
         }
         return admissionScores;
     }
@@ -135,7 +137,7 @@ public class ScoreService {
     public AdmissionScore getAdmissionScore(Integer applyingMajorId) {
         // 缓存key
         String applyingMajorIdKey = APPLYING_MAJOR_ID_KEY.concat(String.valueOf(applyingMajorId));
-        AdmissionScore admissionScore = (AdmissionScore)cache.getIfPresent(applyingMajorIdKey);
+        AdmissionScore admissionScore = redisUtils.get(applyingMajorIdKey, AdmissionScore.class);
         if (Objects.isNull(admissionScore)) {
             AdmissionScore queryAdmissionScore = new AdmissionScore();
             queryAdmissionScore.setApplyingMajorId(applyingMajorId);
@@ -144,7 +146,7 @@ public class ScoreService {
             if (admissionScore == null) {
                 return admissionScore;
             }
-            cache.put(applyingMajorIdKey, admissionScore);
+            redisUtils.put(applyingMajorIdKey, admissionScore);
         }
         return admissionScore;
     }
