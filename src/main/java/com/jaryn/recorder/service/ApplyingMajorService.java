@@ -69,4 +69,20 @@ public class ApplyingMajorService {
         }
         return applyingMajor;
     }
+
+    /**
+     * 根据院系和专业 获取指定的报考院系
+     */
+    public ApplyingMajor getApplyingMajor(String department, String major) {
+        String key = APPLYING_MAJOR_KEY.concat(department).concat(major);
+        ApplyingMajor applyingMajor = redisUtils.get(key, ApplyingMajor.class);
+        if (Objects.isNull(applyingMajor)) {
+            ApplyingMajor queryApplyingMajor = new ApplyingMajor();
+            queryApplyingMajor.setDepartmentInfo(department);
+            queryApplyingMajor.setMajorInfo(major);
+            applyingMajor = applyingMajorMapper.findOne(queryApplyingMajor);
+            redisUtils.put(key, applyingMajor);
+        }
+        return applyingMajor;
+    }
 }

@@ -1,5 +1,7 @@
 package com.jaryn.recorder.constants;
 
+import java.util.regex.Pattern;
+
 /**
  * @author: Jaryn
  * @date: 2023/12/27 4:49 下午
@@ -17,11 +19,12 @@ public class Constant {
 
     public static class Http {
         public static final String VERIFY_CODE_HTTP = "https://gsas.fudan.edu.cn/captcha/imageCode";
-        public static final String LOGIN_HTTP = "https://gsas.fudan.edu.cn/logon";
+        public static final String LOGIN_HTTP = "https://gsas.fudan.edu.cn";
+        public static final String INDEX_HTTP = "https://gsas.fudan.edu.cn/sscjcx/index";
         public static final int VERIFY_CODE_MAX_THRESHOLD = 4;
         public static final int LOGIN_MAX_THRESHOLD = 4;
         public static final String VERIFY_CODE_ERROR = "验证码错误";
-        public static final String PASSWORD_ERROR = "用户名或密码有误，请重新输入!";
+        public static final String PASSWORD_ERROR = "未查询到相应的成绩，请检查输入信息!";
         public static final String OPEN_TIME_ERROR = "暂未到开放时间!";
         public static final String USER_TOKEN = "USER_TOKEN";
         public static final int MAX_ERROR_CNT = 20;
@@ -34,6 +37,7 @@ public class Constant {
         public static final String SUFFIX_2 = "(二)";
         public static final String SUFFIX_1_CH = "（一）";
         public static final String SUFFIX_2_CH = "（二）";
+        public static final String SPACE = "&nbsp;";
     }
 
     public static class Cache {
@@ -60,5 +64,22 @@ public class Constant {
 
     public static class Score {
         public static final int COLUMN_CHART_MIN_SCORE = 321;
+    }
+
+    public static class PatternConstant {
+        public static final Pattern ACTION_PATTERN = Pattern.compile("form action=\"(.*?)\"", Pattern.CASE_INSENSITIVE);
+        public static final Pattern SCORE_PATTERN = Pattern.compile(
+                "准考证号</td>\\s*<td[^>]*>(\\d+)</td>.*?" +
+                        "姓名</td>\\s*<td[^>]*>([^<]+)</td>.*?" +
+                        "报考院系</td>.*?<td[^>]*>([^<]+)</td>.*?" +
+                        "报考专业</td>.*?<td[^>]*>([^<]+)</td>.*?" +
+                        "101 思想政治理论</td>\\s*<td[^>]*>([^<]+)</td>.*?" +
+                        "20.*? 英语.*?</td>\\s*<td[^>]*>([^<]+)</td>.*?" +
+                        "<td colspan=\"2\" style=\"border:1px solid black;text-align: center;\">(.*?)</td>.*?" +
+                        "<td colspan=\"2\" style=\"border:1px solid black;text-align: center;\">(.*?)</td>.*?"+
+                        "<td colspan=\"2\" style=\"border:1px solid black;text-align: center;\">(.*?)</td>.*?" +
+                        "<td colspan=\"2\" style=\"border:1px solid black;text-align: center;\">(.*?)</td>.*?" +
+                        "总分</td>\\s*<td[^>]*>([^<]+)</td>.*?" ,
+                Pattern.DOTALL | Pattern.UNICODE_CHARACTER_CLASS);
     }
 }

@@ -108,9 +108,10 @@ public class ScoreService {
     /**
      * 获取分数列表
      */
-    public List<Score> getScores(Integer applyingMajorId) {
+    public List<Score> getScores(Integer applyingMajorId, String professionalCourse2Name) {
         Score allScoreQuery = new Score();
         allScoreQuery.setApplyingMajorId(applyingMajorId);
+        allScoreQuery.setProfessionalCourse2Name(professionalCourse2Name);
         allScoreQuery.setYear(fduPostgraduateProperties.getYear());
         return scoreMapper.find(allScoreQuery);
     }

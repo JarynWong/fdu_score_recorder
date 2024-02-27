@@ -65,7 +65,8 @@ public class IpLimiterInterceptor implements HandlerInterceptor {
 
         // 记录请求时间戳
         requestTimestampDeque.offer(currentTimestamp);
-        redisUtils.put(ipKey, requestTimestampDeque);
+        // 十分钟有效期
+        redisUtils.put(ipKey, requestTimestampDeque, 10 * 60);
         return true;
     }
 

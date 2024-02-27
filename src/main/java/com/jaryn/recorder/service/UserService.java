@@ -30,12 +30,16 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.function.ToIntFunction;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.jaryn.recorder.constants.Constant.Cache.USER_KEY;
 import static com.jaryn.recorder.constants.Constant.Http.*;
+import static com.jaryn.recorder.constants.Constant.PatternConstant.SCORE_PATTERN;
 import static com.jaryn.recorder.constants.Constant.QueryType.TOTAL;
 import static com.jaryn.recorder.constants.Constant.Score.COLUMN_CHART_MIN_SCORE;
+import static com.jaryn.recorder.constants.Constant.Strings.SPACE;
 
 /**
  * @author: Jaryn
@@ -108,7 +112,7 @@ public class UserService {
         String websiteRes = null;
         for (int i = 0; i < LOGIN_MAX_THRESHOLD; i++) {
             // 先获取验证码信息
-            generateVerifyCode(user);
+            String action = generateVerifyCode(user);
             if (user.getValidateCode() == null || user.getValidateCode().length() != 4) {
                 if (i + 1 == LOGIN_MAX_THRESHOLD) {
                     // 最后一次失败了，让用户重新输入
@@ -119,12 +123,12 @@ public class UserService {
 
             // 开始登陆
             Map<String, String> formMap = new HashMap<>();
-            formMap.put("kslb", user.getType());
+            formMap.put("nd", String.valueOf(fduPostgraduateProperties.getYear()));
             formMap.put("username", user.getUsername());
             formMap.put("password", user.getPassword());
             formMap.put("validateCode", user.getValidateCode());
             Map<String, String> headers = OkHttpUtil.getLoginHeaders(user.getCookies());
-            websiteRes = OkHttpUtil.doFormBodyPost(LOGIN_HTTP, formMap, headers);
+            websiteRes = OkHttpUtil.doFormBodyPost(LOGIN_HTTP.concat(action), formMap, headers);
 
             String errorInfo = Util.getErrorInfo(websiteRes);
             String passwordErrorCntKey = Constant.Cache.PASSWORD_ERROR
@@ -146,12 +150,11 @@ public class UserService {
                 redisUtils.put(passwordErrorCntKey, ++errorCnt);
                 throw new ServiceException(errorInfo);
             }
-            // else if (OPEN_TIME_ERROR.equals(errorInfo)) {
-            //     // 未开放 TODO 开放了就直接删除
-            //     throw new ServiceException(errorInfo);
-            // }
+            else if (OPEN_TIME_ERROR.equals(errorInfo)) {
+                throw new ServiceException(errorInfo);
+            }
             else {
-                // 登陆成功，TODO 封装四门单科信息
+                // 登陆成功，封装四门单科信息
                 assembleScore(user, websiteRes);
                 user.setPassword(null);
                 // 清空密码错误次数
@@ -174,7 +177,7 @@ public class UserService {
         ApplyingMajor applyingMajorInfo = applyingMajorService.getApplyingMajorName(score.getApplyingMajorId());
         loginResponse.setApplyingMajorName(applyingMajorInfo.getApplyingMajorName());
 
-        List<Score> allScores = scoreService.getScores(score.getApplyingMajorId());
+        List<Score> allScores = scoreService.getScores(score.getApplyingMajorId(), score.getProfessionalCourse2Name());
 
         // 根据总分逆序
         StringBuilder rankStr = new StringBuilder();
@@ -399,28 +402,62 @@ public class UserService {
 
 
     /**
-     * TODO 封装四门单科信息
+     * 封装四门单科信息
      *
      * @param user
      * @param res
      */
     private void assembleScore(UserInfo user, String res) {
-        // TODO 处理res字符串，获取四门单科信息
+        // 处理res字符串，获取四门单科信息
+        Matcher matcher = SCORE_PATTERN.matcher(res);
 
-        // 生成随机准考证，防止唯一索引冲突
-        Random random = new Random();
-        int numberOfDigits = 7;
-        int lowerBound = (int) Math.pow(10, numberOfDigits - 1);
-        int upperBound = (int) Math.pow(10, numberOfDigits) - 1;
+        if (matcher.find()) {
+            // // Extract and print the matched groups
+            // System.out.println("准考证号: " + matcher.group(1));
+            // System.out.println("姓名: " + matcher.group(2));
+            // System.out.println("报考院系: " + matcher.group(3).replaceAll("&nbsp;", " ").trim());
+            // System.out.println("报考专业: " + matcher.group(4).replaceAll("&nbsp;", " ").trim());
+            // System.out.println("政治成绩: " + matcher.group(5).trim());
+            // System.out.println("英语成绩: " + matcher.group(6).trim());
+            // System.out.println("专业课1: " + matcher.group(7).trim());
+            // System.out.println("专业课1成绩: " + matcher.group(8).trim());
+            // System.out.println("专业课2: " + matcher.group(9).trim());
+            // System.out.println("专业课2成绩: " + matcher.group(10).trim());
+            // System.out.println("总分: " + matcher.group(11).trim());
 
-        user.setAdmissionTicket(random.nextInt(upperBound - lowerBound + 1) + lowerBound + "");
-        user.setName("十多好");
-        user.setPolitics(60 + random.nextInt(41));
-        user.setEnglish(60 + random.nextInt(41));
-        user.setProfessionalCourse1Score(60 + random.nextInt(41));
-        user.setProfessionalCourse1Name("302 数学 （二）");
-        user.setProfessionalCourse2Score(60 + random.nextInt(41));
-        user.setProfessionalCourse2Name("408 计算机专业基础");
+            user.setAdmissionTicket(matcher.group(1));
+            user.setName(matcher.group(2));
+            user.setPolitics(Integer.parseInt(matcher.group(5).trim()));
+            user.setEnglish(Integer.parseInt(matcher.group(6).trim()));
+            user.setProfessionalCourse1Score(Integer.parseInt(matcher.group(8).trim()));
+            user.setProfessionalCourse1Name(matcher.group(7).trim());
+            user.setProfessionalCourse2Score(Integer.parseInt(matcher.group(10).trim()));
+            user.setProfessionalCourse2Name(matcher.group(9).trim());
+
+            ApplyingMajor applyingMajor = applyingMajorService.getApplyingMajor(matcher.group(3).replaceAll(SPACE, " ").trim(),
+                    matcher.group(4).replaceAll(SPACE, " ").trim());
+            if (applyingMajor == null) {
+                throw new ServiceException("院系专业信息查询失败，请联系作者配置");
+            }
+            user.setApplyingMajorId(applyingMajor.getApplyingMajorId());
+        } else {
+            throw new ServiceException("分数解析失败");
+        }
+
+        // 测试：生成随机准考证，防止唯一索引冲突
+        // Random random = new Random();
+        // int numberOfDigits = 7;
+        // int lowerBound = (int) Math.pow(10, numberOfDigits - 1);
+        // int upperBound = (int) Math.pow(10, numberOfDigits) - 1;
+        //
+        // user.setAdmissionTicket(random.nextInt(upperBound - lowerBound + 1) + lowerBound + "");
+        // user.setName("十多好");
+        // user.setPolitics(60 + random.nextInt(41));
+        // user.setEnglish(60 + random.nextInt(41));
+        // user.setProfessionalCourse1Score(60 + random.nextInt(41));
+        // user.setProfessionalCourse1Name("302 数学 （二）");
+        // user.setProfessionalCourse2Score(60 + random.nextInt(41));
+        // user.setProfessionalCourse2Name("408 计算机专业基础");
     }
 
     /**
@@ -440,11 +477,14 @@ public class UserService {
      *
      * @return
      */
-    private void generateVerifyCode(UserInfo user) {
+    private String generateVerifyCode(UserInfo user) {
         Ocr ocr = context.getBean(Ocr.class);
+        String action = Constant.Strings.EMPTY;
         for (int i = 0; i < VERIFY_CODE_MAX_THRESHOLD; i++) {
             // 获取验证码id_ck
-            String cookies = OkHttpUtil.doGet(LOGIN_HTTP);
+            Map<String, String> resMap = OkHttpUtil.doGet(INDEX_HTTP);
+            String cookies = resMap.get("cookies");
+            action = resMap.get("action");
             user.setCookies(cookies);
             Map<String, String> headers = OkHttpUtil.getCookieHeaders(cookies);
 
@@ -461,6 +501,7 @@ public class UserService {
             }
             log.info("识别验证码失败：{}", verifyCode);
         }
+        return action;
     }
 
     /**

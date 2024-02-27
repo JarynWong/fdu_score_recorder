@@ -18,5 +18,7 @@ public class ApplyingMajor implements Serializable {
      */
     private Integer applyingMajorId;
     private String applyingMajorName;
+    private String departmentInfo;
+    private String majorInfo;
 
 }

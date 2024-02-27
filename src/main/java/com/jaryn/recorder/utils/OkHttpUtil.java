@@ -17,9 +17,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.jaryn.recorder.constants.Constant.Http.USER_TOKEN;
+import static com.jaryn.recorder.constants.Constant.PatternConstant.ACTION_PATTERN;
 
 /**
  * http util
@@ -238,7 +241,7 @@ public class OkHttpUtil {
      * @param url 请求路径
      * @return 响应结果
      */
-    public static String doGet(String url) {
+    public static Map<String, String> doGet(String url) {
         return doGet(url, null);
     }
 
@@ -304,7 +307,7 @@ public class OkHttpUtil {
      * @param headerMap 请求头
      * @return 响应结果
      */
-    public static String doGet(String url, Map<String, String> headerMap) {
+    public static Map<String, String> doGet(String url, Map<String, String> headerMap) {
         Headers.Builder hBuilder = new Headers.Builder();
         //请求头
         if (headerMap != null) {
@@ -387,14 +390,17 @@ public class OkHttpUtil {
         return "";
     }
 
-    private static String execute(Request request) {
+    private static Map<String, String> execute(Request request) {
         Response res = null;
+        // 存放ck和form action="/sscjcx/28198B369067E88DAB9FEFE85484DBF4"
+        Map<String, String> resMap = new HashMap<>();
         String cookies = Constant.Strings.EMPTY;
         try {
             res = client.newCall(request).execute();
             if (res == null) {
                 log.error("响应信息为空");
-                return cookies;
+                resMap.put("cookies", cookies);
+                return resMap;
             }
             if (res.isSuccessful()) {
                 //请求成功
@@ -403,6 +409,14 @@ public class OkHttpUtil {
                     log.debug("cookie: {}", cookie);
                     cookies = cookies.concat(cookie).concat(";");
                 }
+
+                Matcher matcher = ACTION_PATTERN.matcher(res.body().string());
+                if (matcher.find()) {
+                    resMap.put("action", matcher.group(1).trim());
+                } else {
+                    throw new ServiceException("action获取失败");
+                }
+
             } else {
                 //请求失败
                 throw new ServiceException("请求失败");
@@ -412,7 +426,8 @@ public class OkHttpUtil {
         } finally {
             Optional.ofNullable(res).ifPresent(Response::close);
         }
-        return cookies;
+        resMap.put("cookies", cookies);
+        return resMap;
     }
 
     // /**

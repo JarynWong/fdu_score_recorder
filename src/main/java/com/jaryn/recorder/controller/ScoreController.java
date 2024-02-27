@@ -61,7 +61,7 @@ public class ScoreController {
         String token = OkHttpUtil.getToken(servletRequest);
         UserInfo user = redisUtils.get(token, UserInfo.class);
 
-        List<Score> scores = scoreService.getScores(user.getApplyingMajorId());
+        List<Score> scores = scoreService.getScores(user.getApplyingMajorId(), user.getProfessionalCourse2Name());
         Score userScore = scoreService.saveScore(user);
 
         // 排序
