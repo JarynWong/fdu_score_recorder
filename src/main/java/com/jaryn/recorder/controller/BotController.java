@@ -75,7 +75,7 @@ public class BotController {
                 .concat(String.valueOf(fduPostgraduateProperties.getYear()));
         Integer failCnt = redisUtils.get(examineeFailCntKey, Integer.class);
         if (failCnt != null && failCnt >= MAX_ADD_GROUP_FAIL_CNT) {
-            throw new ServiceException("过多尝试，请1-2天后重试");
+            throw new ServiceException("过多申请，请稍后重试");
         }
     }
 
@@ -93,7 +93,8 @@ public class BotController {
             if (failCnt == null) {
                 failCnt = 0;
             }
-            redisUtils.put(examineeFailCntKey, ++failCnt, 30 * 24 * 60 * 60);
+            // 60分钟内失败过多
+            redisUtils.put(examineeFailCntKey, ++failCnt, 60 * 60);
         } else {
             // 清空原有失败次数的cache
             Integer failCnt = redisUtils.get(examineeFailCntKey, Integer.class);

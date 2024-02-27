@@ -11,6 +11,8 @@
         <where>
             <if test="applyingMajorId != null"> applying_major_id = #{applyingMajorId} </if>
             <if test="applyingMajorName != null"> AND applying_major_name = #{applyingMajorName} </if>
+            <if test="departmentInfo != null"> AND department_info = #{departmentInfo} </if>
+            <if test="majorInfo != null"> AND major_info = #{majorInfo} </if>
         </where>
     </select>
 

@@ -94,10 +94,10 @@ public class UserService {
         if (user.getUsername().length() < 6 || user.getPassword().length() < 6 || !Util.isNumeric(user.getUsername())) {
             throw new ServiceException("用户名或密码错误");
         }
-        String key = PASSWORD_ERROR
+        String passwordErrorKey = Constant.Cache.PASSWORD_ERROR
                 .concat(user.getUsername())
                 .concat(String.valueOf(fduPostgraduateProperties.getYear()));
-        Integer errorCnt = redisUtils.get(key, Integer.class);
+        Integer errorCnt = redisUtils.get(passwordErrorKey, Integer.class);
         if (errorCnt != null && errorCnt >= MAX_ERROR_CNT) {
             throw new ServiceException("密码错误次数过多，请1-2天后重试");
         }
