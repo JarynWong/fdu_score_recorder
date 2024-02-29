@@ -1,5 +1,6 @@
 package com.jaryn.recorder.constants;
 
+import java.text.SimpleDateFormat;
 import java.util.regex.Pattern;
 
 /**
@@ -47,7 +48,7 @@ public class Constant {
         public static final String APPLYING_MAJORS_ID_KEY = "applyingMajorsId:";
         public static final String SCORE_KEY = "score:";
         public static final String USER_KEY = "user:";
-        public static final String TOKEN_KEY = "token:";
+        public static final String RECORD_COUNT_KEY = "recordCount:";
         public static final String IP_KEY = "ip:";
         public static final String PASSWORD_ERROR = "passwordError:";
         public static final String QUERY_EXAMINEE_FAIL = "examineeError:";
@@ -64,6 +65,7 @@ public class Constant {
 
     public static class Score {
         public static final int COLUMN_CHART_MIN_SCORE = 321;
+        public static final SimpleDateFormat FORMATTER = new SimpleDateFormat("MM.dd");
     }
 
     public static class PatternConstant {
@@ -76,10 +78,10 @@ public class Constant {
                         "101 思想政治理论</td>\\s*<td[^>]*>([^<]+)</td>.*?" +
                         "20.*? 英语.*?</td>\\s*<td[^>]*>([^<]+)</td>.*?" +
                         "<td colspan=\"2\" style=\"border:1px solid black;text-align: center;\">(.*?)</td>.*?" +
-                        "<td colspan=\"2\" style=\"border:1px solid black;text-align: center;\">(.*?)</td>.*?"+
                         "<td colspan=\"2\" style=\"border:1px solid black;text-align: center;\">(.*?)</td>.*?" +
                         "<td colspan=\"2\" style=\"border:1px solid black;text-align: center;\">(.*?)</td>.*?" +
-                        "总分</td>\\s*<td[^>]*>([^<]+)</td>.*?" ,
+                        "<td colspan=\"2\" style=\"border:1px solid black;text-align: center;\">(.*?)</td>.*?" +
+                        "总分</td>\\s*<td[^>]*>([^<]+)</td>.*?",
                 Pattern.DOTALL | Pattern.UNICODE_CHARACTER_CLASS);
     }
 }

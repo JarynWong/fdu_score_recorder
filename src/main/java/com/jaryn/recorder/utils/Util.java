@@ -7,6 +7,8 @@ import com.jaryn.recorder.response.pojo.OverallScore;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -17,6 +19,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.jaryn.recorder.constants.Constant.QueryType.*;
+import static com.jaryn.recorder.constants.Constant.Score.FORMATTER;
 
 /**
  * @author: Jaryn
@@ -107,6 +110,13 @@ public class Util {
      */
     public static boolean isNumeric(String str){
         return str.matches("\\d+");
+    }
+
+    /**
+     * 判断两天是不是同一天
+     */
+    public static boolean isSameDay(Date date1, Date date2) {
+        return FORMATTER.format(date1).equals(FORMATTER.format(date2));
     }
 
 

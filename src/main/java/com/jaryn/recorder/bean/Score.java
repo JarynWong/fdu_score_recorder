@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.Date;
 
 @Data
 @NoArgsConstructor
@@ -30,6 +31,7 @@ public class Score extends OverallScore implements Serializable {
     private Integer totalScore;
     private Integer applyingMajorId;
     private Integer year;
+    private Date createTime;
 
     public void calculateTotalScore() {
         totalScore = politics + english + professionalCourse1Score + professionalCourse2Score;

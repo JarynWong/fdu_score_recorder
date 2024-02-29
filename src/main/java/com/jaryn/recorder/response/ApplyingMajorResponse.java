@@ -1,8 +1,6 @@
 package com.jaryn.recorder.response;
 
 import com.jaryn.recorder.bean.ApplyingMajor;
-import com.jaryn.recorder.response.pojo.ColumnChart;
-import com.jaryn.recorder.response.pojo.OverallScore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

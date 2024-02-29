@@ -1,6 +1,6 @@
 package com.jaryn.recorder.service;
 
-import com.google.common.cache.Cache;
+import com.alibaba.fastjson2.util.DateUtils;
 import com.jaryn.recorder.bean.AdmissionScore;
 import com.jaryn.recorder.bean.ApplyingMajor;
 import com.jaryn.recorder.bean.Score;
@@ -10,7 +10,8 @@ import com.jaryn.recorder.constants.Constant;
 import com.jaryn.recorder.exception.ServiceException;
 import com.jaryn.recorder.ocr.Ocr;
 import com.jaryn.recorder.response.LoginResponse;
-import com.jaryn.recorder.response.pojo.ColumnChart;
+import com.jaryn.recorder.response.pojo.RecordCountColumnChart;
+import com.jaryn.recorder.response.pojo.ScoreRangeColumnChart;
 import com.jaryn.recorder.response.pojo.LineChart;
 import com.jaryn.recorder.response.pojo.OverallScore;
 import com.jaryn.recorder.utils.OkHttpUtil;
@@ -28,17 +29,18 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.ToIntFunction;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static com.jaryn.recorder.constants.Constant.Cache.USER_KEY;
+import static com.jaryn.recorder.constants.Constant.Cache.RECORD_COUNT_KEY;
 import static com.jaryn.recorder.constants.Constant.Http.*;
 import static com.jaryn.recorder.constants.Constant.PatternConstant.SCORE_PATTERN;
 import static com.jaryn.recorder.constants.Constant.QueryType.TOTAL;
 import static com.jaryn.recorder.constants.Constant.Score.COLUMN_CHART_MIN_SCORE;
+import static com.jaryn.recorder.constants.Constant.Score.FORMATTER;
 import static com.jaryn.recorder.constants.Constant.Strings.SPACE;
 
 /**
@@ -212,7 +214,58 @@ public class UserService {
                 .sorted(Comparator.comparingInt(LineChart::getYear))
                 .collect(Collectors.toList());
         loginResponse.setLineCharts(lineCharts);
+
+        // 录分人数变动情况-柱状图
+        List<RecordCountColumnChart> recordCountColumnCharts = getRecordCountColumnCharts(allScores);
+        loginResponse.setRecordCountColumnCharts(recordCountColumnCharts);
+
         return loginResponse;
+    }
+
+    /**
+     * 获取录分人数变动情况-柱状图
+     * @param allScores
+     * @return
+     */
+    private List<RecordCountColumnChart> getRecordCountColumnCharts(List<Score> allScores) {
+        String applyingMajorId = String.valueOf(allScores.get(0).getApplyingMajorId());
+        String professionalCourse2Name = String.valueOf(allScores.get(0).getProfessionalCourse2Name());
+        String keyPrefix = RECORD_COUNT_KEY.concat(applyingMajorId).concat(professionalCourse2Name);
+        List<RecordCountColumnChart> recordCountColumnCharts = new ArrayList<>();
+
+        Date now = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(now);
+
+        // 先算今天的人数，再算之前的人数，加入list后逆序
+        int recordCountToday = (int) allScores.stream()
+                .filter(recordScore -> Util.isSameDay(now, recordScore.getCreateTime()))
+                .count();
+
+        // 从今天前开始统计：今天之前的去缓存里取，取不到停，今天的实时更新到redis
+        Integer recordCountBefore;
+        do {
+            // 将日期往前移动一天
+            calendar.add(Calendar.DATE, -1);
+            Date dayBefore = calendar.getTime();
+            calendar.setTime(dayBefore);
+            String dayBeforeStr = FORMATTER.format(dayBefore);
+            recordCountBefore = redisUtils.get(keyPrefix.concat(dayBeforeStr), Integer.class);
+            if (recordCountBefore != null) {
+                recordCountColumnCharts.add(new RecordCountColumnChart(dayBeforeStr, recordCountBefore));
+            }
+        } while (recordCountBefore != null);
+
+        // 按时间升序
+        Collections.reverse(recordCountColumnCharts);
+        String nowStr = FORMATTER.format(now);
+        recordCountColumnCharts.add(new RecordCountColumnChart(nowStr, recordCountToday));
+        Integer recordCountTodayInCache = redisUtils.get(keyPrefix.concat(nowStr), Integer.class);
+        // 防止频繁写redis，cache中当天的录分人数与数据库的不一样
+        if (recordCountTodayInCache == null || !recordCountTodayInCache.equals(recordCountToday)) {
+            redisUtils.put(keyPrefix.concat(nowStr), recordCountToday,40 * 24 * 60 * 60);
+        }
+        return recordCountColumnCharts;
     }
 
     /**
@@ -313,14 +366,14 @@ public class UserService {
     /**
      * 获取柱状图
      */
-    public List<ColumnChart> obtainColumnCharts(String queryType, List<OverallScore> overallScores, AdmissionScore admissionScore) {
+    public List<ScoreRangeColumnChart> obtainColumnCharts(String queryType, List<OverallScore> overallScores, AdmissionScore admissionScore) {
         ToIntFunction<OverallScore> functionByQueryType = Util.getIntFunctionByQueryType(queryType);
 
-        List<ColumnChart> columnCharts = new ArrayList<>();
+        List<ScoreRangeColumnChart> columnCharts = new ArrayList<>();
 
         // 最高分段柱状图计算
         int maxScore = functionByQueryType.applyAsInt(overallScores.get(0));
-        ColumnChart maxScoreColumnChart = new ColumnChart();
+        ScoreRangeColumnChart maxScoreColumnChart = new ScoreRangeColumnChart();
         maxScoreColumnChart.setMax(maxScore);
         // 如果分数%10=1那么x坐标就显示这个分数，其次分数%10=0，那么显示（分数/10-1）*10+1 到 这个分数的分数段，最后否则显示分数/10*10+1 到 这个分数的分数段
         if (maxScore % 10 == 1) {
@@ -345,7 +398,7 @@ public class UserService {
         }
 
 
-        ColumnChart minScoreColumnChart = new ColumnChart();
+        ScoreRangeColumnChart minScoreColumnChart = new ScoreRangeColumnChart();
         minScoreColumnChart.setMin(minScore);
         // 如果分数%10=0那么x坐标就显示这个分数，否则显示 这个分数到（分数/10+1）*10的分数段
         if (minScore % 10 == 0) {
@@ -364,7 +417,7 @@ public class UserService {
         // 中间分数段个数=midmax/10到midmin/10的差值
         int midColumnChartCnt = midMax / 10 - midMin / 10;
         for (int i = 0; i < midColumnChartCnt; i++) {
-            ColumnChart midScoreColumnChart = new ColumnChart();
+            ScoreRangeColumnChart midScoreColumnChart = new ScoreRangeColumnChart();
             midScoreColumnChart.setMin(midMin);
             // 351 + 9 = 360
             midScoreColumnChart.setMax(midMin + 9);
@@ -463,7 +516,7 @@ public class UserService {
     /**
      * 计算柱状图分数段人数
      */
-    private void calculateColumnChartCount(List<OverallScore> overallScores, ColumnChart columnChart, String queryType) {
+    private void calculateColumnChartCount(List<OverallScore> overallScores, ScoreRangeColumnChart columnChart, String queryType) {
         // 计算分数段人数
         long count = overallScores.stream()
                 .map(Util.getFunctionByQueryType(queryType))

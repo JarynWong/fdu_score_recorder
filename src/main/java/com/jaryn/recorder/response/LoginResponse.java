@@ -1,6 +1,7 @@
 package com.jaryn.recorder.response;
 
-import com.jaryn.recorder.response.pojo.ColumnChart;
+import com.jaryn.recorder.response.pojo.RecordCountColumnChart;
+import com.jaryn.recorder.response.pojo.ScoreRangeColumnChart;
 import com.jaryn.recorder.response.pojo.LineChart;
 import com.jaryn.recorder.response.pojo.OverallScore;
 import lombok.AllArgsConstructor;
@@ -47,7 +48,12 @@ public class LoginResponse {
     /**
      * 柱状图信息
      */
-    private List<ColumnChart> columnCharts;
+    private List<ScoreRangeColumnChart> columnCharts;
+
+    /**
+     * 录分人数变动情况
+     */
+    private List<RecordCountColumnChart> recordCountColumnCharts;
 
     /**
      * 折线图信息

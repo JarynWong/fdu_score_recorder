@@ -1,6 +1,6 @@
 package com.jaryn.recorder.response;
 
-import com.jaryn.recorder.response.pojo.ColumnChart;
+import com.jaryn.recorder.response.pojo.ScoreRangeColumnChart;
 import com.jaryn.recorder.response.pojo.OverallScore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -36,5 +36,5 @@ public class ScoreQueryResponse {
     /**
      * 柱状图信息
      */
-    private List<ColumnChart> columnCharts;
+    private List<ScoreRangeColumnChart> columnCharts;
 }

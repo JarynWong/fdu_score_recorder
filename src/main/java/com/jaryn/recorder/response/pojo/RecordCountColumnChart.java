@@ -6,17 +6,19 @@ import lombok.NoArgsConstructor;
 
 /**
  * @author: Jaryn
- * @date: 2024/1/2 10:18 上午
- * @description: 柱状图信息
+ * @date: 2024/2/29 10:18 上午
+ * @description: 录分人数柱状图信息
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ColumnChart {
+public class RecordCountColumnChart {
     /**
-     * 柱状图x轴的下限、上限、人数
+     * 2.26开始
      */
-    private int min;
-    private int max;
+    private String date;
+    /**
+     * 录分人数
+     */
     private int count;
 }

@@ -2,7 +2,7 @@ spring:
   datasource:
     username: fudan
     password: Fudan123456*
-    url: jdbc:mysql://47.103.103.86:3306/fdu_postgraduate_score
+    url: jdbc:mysql://47.103.103.86:3306/fdu_postgraduate_score?serverTimezone=Asia/Shanghai
 #    username: root
 #    password: Myx521++
 #    url: jdbc:mysql://10.162.140.36:3306/fdu_postgraduate_score
@@ -17,7 +17,7 @@ spring:
     property-naming-strategy: SNAKE_CASE
 #redis集群
   redis:
-    host: 127.0.0.1
+    host: 47.103.103.86
     port: 6379
     timeout: 20000
     pool:
@@ -25,7 +25,7 @@ spring:
       min-idle: 0
       max-idle: 8
       max-wait: -1
-    password:
+    password: myx521++
 mybatis:
   config-location: classpath:mybatis/mybatis-config.xml
   mapper-locations: classpath:mybatis/mapper/*
