@@ -1,6 +1,7 @@
 # 复旦大学录分系统 - 后端
-基于SpringBoot框架
-前后端分离 + mysql & redis
+基于SpringBoot框架<br>
+前后端分离 + mysql & redis<br>
+**祝大家成功上岸！觉得有帮助请点个star呀:)** <br>
 ## 界面展示
 ![image](https://github.com/user-attachments/assets/a305d017-2a0e-4ab7-b7c3-e597cb71185a)
 ![image](https://github.com/user-attachments/assets/46d77362-adf7-40c2-b537-1bf9921054d0)
