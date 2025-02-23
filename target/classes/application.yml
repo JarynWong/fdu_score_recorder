@@ -1,11 +1,8 @@
 spring:
   datasource:
-    username: fudan
-    password: Fudan123456*
-    url: jdbc:mysql://47.103.103.86:3306/fdu_postgraduate_score?serverTimezone=Asia/Shanghai
-#    username: root
-#    password: Myx521++
-#    url: jdbc:mysql://10.162.140.36:3306/fdu_postgraduate_score
+    username: root
+    password: Myx521++
+    url: jdbc:mysql://47.100.12.93:3306/fdu_postgraduate_score?serverTimezone=Asia/Shanghai
     driver-class-name: com.mysql.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource
     filters: stat
@@ -17,7 +14,7 @@ spring:
     property-naming-strategy: SNAKE_CASE
 #redis集群
   redis:
-    host: 47.103.103.86
+    host: 47.100.12.93
     port: 6379
     timeout: 20000
     pool:
@@ -25,7 +22,7 @@ spring:
       min-idle: 0
       max-idle: 8
       max-wait: -1
-    password: myx521++
+    password: Myx521++
 mybatis:
   config-location: classpath:mybatis/mybatis-config.xml
   mapper-locations: classpath:mybatis/mapper/*
@@ -44,7 +41,7 @@ logging:
 # 报考年份
 fdu:
   postgraduate:
-    year: 2024
+    year: 2025
     permitsPerSecond: 20
     ipPermitsPerMin: 15
     frontEndIp: http://127.0.0.1:4000

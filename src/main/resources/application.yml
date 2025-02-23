@@ -7,9 +7,6 @@ spring:
     type: com.alibaba.druid.pool.DruidDataSource
     filters: stat
     initialization-mode: always
-#    schema:
-#      - classpath:sql/dep.sql
-#      - classpath:sql/emp.sql
   jackson:
     property-naming-strategy: SNAKE_CASE
 #redis集群
